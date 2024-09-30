@@ -1,0 +1,47 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+header {
+  background-color: #f4f4f4;
+  padding: 1rem;
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+nav ul li {
+  display: inline;
+  margin-right: 10px;
+}
+
+.form-container {
+  margin: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.pedidos-container {
+  margin: 20px;
+}
+
+.message-container {
+  margin: 20px;
+  color: green;
+}

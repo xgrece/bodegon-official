@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestión del Restaurante</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  </head>
+  <body>
+    <header>
+      <h1>Bienvenido a la Gestión del Restaurante</h1>
+    </header>
+    <main>
+      <div class="container">
+        <!-- Sección Clientes -->
+        <div class="card">
+          <h2>Clientes</h2>
+          <p>Gestiona los datos de los clientes.</p>
+          <div class="button-group">
+            <a href="/crear_cliente" class="button">Crear Cliente</a>
+            <a href="/read_clientes" class="button">Ver Clientes</a>
+            <a href="/actualizar_cliente.html" class="button">Actualizar Cliente</a>
+            <a href="/eliminar_cliente.html" class="button">Eliminar Cliente</a>
+          </div>
+        </div>
+
+        <!-- Sección Mesas -->
+        <div class="card">
+          <h2>Mesas</h2>
+          <p>Gestiona las mesas del restaurante.</p>
+          <div class="button-group">
+            <a href="/crear_mesa" class="button">Crear Mesa</a>
+            <a href="/read_mesas" class="button">Ver Mesas</a>
+            <a href="/actualizar_mesa.html" class="button">Actualizar Mesa</a>
+            <a href="/eliminar_mesa.html" class="button">Eliminar Mesa</a>
+          </div>
+        </div>
+
+        <!-- Sección Pedidos -->
+        <div class="card">
+          <h2>Pedidos</h2>
+          <p>Gestiona los pedidos de los clientes.</p>
+          <div class="button-group">
+            <a href="/crear_pedido.html" class="button">Crear Pedido</a>
+            <a href="/listar_pedidos.html" class="button">Ver Pedidos</a>
+            <a href="/actualizar_pedido.html" class="button">Actualizar Pedido</a>
+            <a href="/eliminar_pedido.html" class="button">Eliminar Pedido</a>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <p>&copy; Bodegon El Ferroviario</p>
+    </footer>
+  </body>
+</html>

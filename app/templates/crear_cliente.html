@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Crear Cliente</title>
+    <link rel="stylesheet" href="/static/crear_cliente.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Crear nuevo cliente</h1>
+    </header>
+    <nav>
+      <ul>
+        <li><a href="/">Inicio</a></li>
+        <!-- Otras opciones de navegación -->
+      </ul>
+    </nav>
+
+    <div class="form-container">
+      <form action="/crear_cliente" method="post">
+        <div class="form-group">
+          <label for="nombre">Nombre:</label>
+          <input type="text" id="nombre" name="nombre" required />
+        </div>
+        <div class="form-group">
+          <label for="apellido">Apellido:</label>
+          <input type="text" id="apellido" name="apellido" required />
+        </div>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+        <div class="form-group">
+          <label for="email">Telefono:</label>
+          <input type="tel" id="telefono" name="telefono" required />
+        </div>
+        <div class="form-group">
+          <button type="submit">Crear Cliente</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Mensaje de éxito (si existe) -->
+    {% if message %}
+    <div class="message-container">
+      <p class="message">{{ message }}</p>
+    </div>
+    {% endif %}
+  </body>
+</html>
