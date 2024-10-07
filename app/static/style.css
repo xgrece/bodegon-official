@@ -104,3 +104,13 @@ footer {
   font-size: 0.9rem;
   margin-top: 40px;
 }
+
+#descripcion {
+  background: #2a2a2a; /* Color de fondo */
+  color: white; /* Color del texto */
+  border: 1px solid #444; /* Opcional: color del borde */
+  padding: 10px; /* Opcional: espacio interno */
+  width: 100%; /* Opcional: ancho completo */
+  height: 100px; /* Opcional: altura */
+  resize: none; /* Opcional: desactivar el redimensionamiento */
+}

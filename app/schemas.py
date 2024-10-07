@@ -195,3 +195,25 @@ class Inventario(InventarioBase):
         
 #---------------------- U S U A R I O ----------------------------------------------
 
+#=================================== INGREDIENTES ========================================
+
+# Base schema for Ingredient
+class IngredienteBase(BaseModel):
+    nombre: str
+
+# Schema for creating a new ingredient
+class IngredienteCreate(IngredienteBase):
+    pass
+
+# Schema for updating an ingredient (in case you need it in the future)
+class IngredienteUpdate(IngredienteBase):
+    pass
+
+# Full schema for Ingredient (used when reading from DB)
+class Ingrediente(IngredienteBase):
+    id: int
+    combo_id: int
+
+    class Config:
+        from_attributes = True
+

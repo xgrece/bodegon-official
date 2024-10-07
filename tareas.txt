@@ -1,0 +1,3 @@
+- pasar los ingredientes al actualizar (combo)
+- 127.0.0.1:56486 - "GET /static/planilla.css HTTP/1.1" 304 Not Modified
+- revisar los metodos de mesa

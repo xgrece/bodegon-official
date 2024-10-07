@@ -154,17 +154,6 @@ def create_mesa(
         
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
                
 @router.get("/mesas/{mesa_id}", response_model=schemas.Mesa, tags=["Mesas"])
 def read_mesa(mesa_id: int, db: Session = Depends(get_db)):
@@ -236,3 +225,109 @@ async def create_pedido(request: Request, mesa: int = Form(...), producto: str =
 @router.get("/pedido", response_class=HTMLResponse, tags=["Pedidos"])
 async def read_pedido(request: Request):
     return templates.TemplateResponse("pedido.html", {"request": request, "pedidos": pedidos})
+
+#======================================= COMBOS ========================================
+# Mostrar el formulario para crear combo (GET)
+@router.get("/crear_combo", response_class=HTMLResponse)
+async def show_create_combo_form(request: Request):
+    return templates.TemplateResponse("crear_combo.html", {"request": request})
+
+# Crear un combo (POST)
+@router.post("/crear_combo", response_class=HTMLResponse)
+async def create_combo(
+    request: Request,
+    nombre: str = Form(...),
+    descripcion: str = Form(...),
+    precio: float = Form(...),
+    ingredientes: list[str] = Form(...),  # Recibe múltiples ingredientes seleccionados
+    db: Session = Depends(get_db)
+):
+    try:
+        # Crear el combo con los ingredientes seleccionados
+        combo_data = schemas.ComboCreate(
+            nombre=nombre, 
+            descripcion=descripcion, 
+            precio=precio
+        )
+
+        # Llamar a la función para guardar en la base de datos
+        combo = crud.create_combo(db, combo_data, ingredientes)
+
+        message = f"Combo {nombre} creado exitosamente"
+    except Exception as e:
+        message = f"Error al crear el combo: {str(e)}"
+
+    return templates.TemplateResponse("crear_combo.html", {
+        "request": request,
+        "message": message
+    })
+
+# Obtener un combo por ID (GET)
+@router.get("/combos/{combo_id}", response_model=schemas.Combo)
+async def read_combo(combo_id: int, db: Session = Depends(get_db)):
+    combo = crud.get_combo(db, combo_id)
+    if combo is None:
+        raise HTTPException(status_code=404, detail="Combo no encontrado")
+    return combo
+
+# Leer todos los combos (GET)
+@router.get("/read_combos", response_class=HTMLResponse)
+async def read_combos(request: Request, db: Session = Depends(get_db), message: str = None):
+    combos = crud.get_combos(db)
+    return templates.TemplateResponse("read_combos.html", {
+        "request": request, 
+        "combos": combos,
+        "message": message
+    })
+
+# Actualizar un combo (POST)
+@router.post("/combos/{combo_id}/actualizar", response_class=HTMLResponse)
+async def actualizar_combo(
+    request: Request,
+    combo_id: int, 
+    nombre: str = Form(...), 
+    descripcion: str = Form(None), 
+    precio: float = Form(...), 
+    db: Session = Depends(get_db)
+):
+    try:
+        # Llamar a la función de actualización desde crud.py
+        combo_actualizado = crud.update_combo(
+            db, 
+            combo_id, 
+            schemas.ComboUpdate(
+                nombre=nombre, 
+                descripcion=descripcion, 
+                precio=precio
+            )
+        )
+        
+        if combo_actualizado is None:
+            raise HTTPException(status_code=404, detail="Combo no encontrado")
+        
+        # Obtener los ingredientes asociados al combo actualizado
+        combo_actualizado.ingredientes = crud.get_ingredientes_por_combo(db, combo_id)
+
+        message = "Combo actualizado exitosamente"
+    except Exception as e:
+        message = f"Error al actualizar el combo: {str(e)}"
+    
+    # Devuelve la plantilla con la información del combo actualizado
+    return templates.TemplateResponse("read_combos.html", {
+        "request": request,
+        "message": message,
+        "combo": combo_actualizado  # Incluye el combo actualizado
+    })
+
+# Eliminar un combo (POST)
+@router.post("/combos/{combo_id}/eliminar", response_class=HTMLResponse)
+async def delete_combo(combo_id: int, db: Session = Depends(get_db)):
+    result = crud.delete_combo(db, combo_id)
+
+    if result.get("status") == "success":
+        return HTMLResponse(content="Combo eliminado exitosamente", status_code=200)
+    else:
+        return HTMLResponse(content="Error al eliminar el combo", status_code=400)
+    
+    
+    #======================================= INGREDIENTES ========================================

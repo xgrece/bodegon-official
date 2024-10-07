@@ -138,11 +138,11 @@ class Reserva(Base):
 class Combo(Base):
     __tablename__ = 'combos'
     id = Column(Integer, primary_key=True, index=True)
-    nombre_combo = Column(String(250), index=True)
+    nombre = Column(String(250), index=True)
     descripcion = Column(String(500))
     precio = Column(Float)
     pedidos = relationship("Pedido", back_populates="combo")
-    
+    ingredientes = relationship("Ingrediente", back_populates="combo")
     # Métodos CRUD
     @classmethod
     def create(cls, session: Session, **kwargs):
@@ -401,3 +401,13 @@ class Inventario(Base):
         session.commit()
         
 #---------------------- U S U A R I O ----------------------------------------------
+
+#============================== INGREDIENTES ========================================
+class Ingrediente(Base):
+    __tablename__ = "ingredientes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String(250), index=True)
+    combo_id = Column(Integer, ForeignKey("combos.id"))
+
+    combo = relationship("Combo", back_populates="ingredientes")

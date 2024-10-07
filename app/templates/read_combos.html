@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista de Combos</title>
+    <link rel="stylesheet" href="/static/planilla.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Lista de Combos</h1>
+    </header>
+    <nav>
+      <ul>
+        <li><a href="/">Inicio</a></li>
+        <li><a href="/crear_combo">Crear Combo</a></li>
+      </ul>
+    </nav>
+
+    <!-- Mensaje de éxito (si existe) -->
+    {% if message %}
+    <div class="message-container">
+      <p class="message">{{ message }}</p>
+    </div>
+    {% endif %}
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+          <th>Ingredientes</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for combo in combos %}
+        <tr>
+          <td>{{ combo.id }}</td>
+          <td>{{ combo.nombre }}</td>
+          <td>{{ combo.descripcion }}</td>
+          <td>{{ combo.precio }} USD</td>
+
+          <td>
+            <ul>
+              {% for ingrediente in combo.ingredientes %}
+              <li>{{ ingrediente.nombre }}</li>
+              <!-- Cambia 'productos' a 'ingredientes' -->
+              {% endfor %}
+            </ul>
+          </td>
+          <td>
+            <button onclick="showUpdateForm('{{ combo.id }}')">Actualizar</button>
+            <button onclick="showDeleteForm('{{ combo.id }}')">Eliminar</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Formulario de actualización -->
+    <div id="updateForm" style="display: none">
+      <h2>Actualizar Combo</h2>
+      <form
+        id="formActualizar"
+        action="/combos/{{combo_id}}/actualizar"
+        method="post"
+        onsubmit="enviarActualizarCombo(event)"
+      >
+        <input type="hidden" id="updateId" name="id" />
+        <div class="acomodar-input">
+          <label for="updateNombre">Nombre:</label>
+          <input type="text" id="updateNombre" name="nombre" required />
+        </div>
+        <div class="acomodar-input">
+          <label for="updateDescripcion">Descripción:</label>
+          <textarea id="updateDescripcion" name="descripcion" required></textarea>
+        </div>
+        <div class="acomodar-input">
+          <label for="updatePrecio">Precio:</label>
+          <input type="number" id="updatePrecio" name="precio" step="0.01" required />
+        </div>
+
+        <div class="acomodar-input">
+          <label for="updateIngredientes">Ingredientes:</label>
+          <div id="ingredientesCheckboxes">
+            {% for ingrediente in ingredientes %}
+            <div>
+              <input
+                type="checkbox"
+                id="ingrediente{{ ingrediente.id }}"
+                name="ingredientes"
+                value="{{ ingrediente.id }}"
+              />
+              <label for="ingrediente{{ ingrediente.id }}">{{ ingrediente.nombre }}</label>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="botones-act-dele">
+          <button type="submit">Actualizar</button>
+          <button class="pis" type="button" onclick="hideUpdateForm()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Formulario de eliminación -->
+    <div id="deleteForm" style="display: none">
+      <h2>Eliminar Combo</h2>
+      <form id="deleteComboForm" method="post">
+        <input type="hidden" id="deleteId" name="id" />
+        <p class="parrafo">¿Estás seguro de que deseas eliminar este combo?</p>
+        <div class="botones-act-dele1">
+          <button type="button" onclick="eliminarCombo()">Eliminar</button>
+          <button class="pis" type="button" onclick="hideDeleteForm()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      function showUpdateForm(id) {
+        // Limpiar el formulario antes de mostrarlo
+        document.getElementById("updateId").value = "";
+        document.getElementById("updateNombre").value = "";
+        document.getElementById("updateDescripcion").value = "";
+        document.getElementById("updatePrecio").value = "";
+
+        // Limpiar las casillas de verificación de ingredientes
+        document.querySelectorAll("#ingredientesCheckboxes input[type='checkbox']").forEach((checkbox) => {
+          checkbox.checked = false;
+        });
+
+        fetch(`/combos/${id}`)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Error en la respuesta de la API");
+            }
+            return response.json();
+          })
+          .then((combo) => {
+            console.log("Combo recibido:", combo); // Añadir este log
+            // Asignar valores al formulario
+            document.getElementById("updateId").value = combo.id;
+            document.getElementById("updateNombre").value = combo.nombre;
+            document.getElementById("updateDescripcion").value = combo.descripcion;
+            document.getElementById("updatePrecio").value = combo.precio;
+
+            // Marcar los ingredientes seleccionados
+            if (Array.isArray(combo.ingredientes)) {
+              combo.ingredientes.forEach((ingrediente) => {
+                const checkbox = document.getElementById(`ingrediente${ingrediente.id}`);
+                if (checkbox) {
+                  checkbox.checked = true; // Marca el checkbox correspondiente
+                }
+              });
+            } else {
+              console.error("La propiedad 'ingredientes' no es un array");
+            }
+
+            // Mostrar el formulario de actualización
+            document.getElementById("updateForm").style.display = "block";
+            document.getElementById("deleteForm").style.display = "none";
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      function showDeleteForm(id) {
+        document.getElementById("deleteId").value = id;
+        document.getElementById("deleteForm").style.display = "block";
+        document.getElementById("updateForm").style.display = "none";
+      }
+
+      function hideUpdateForm() {
+        document.getElementById("updateForm").style.display = "none";
+      }
+
+      function hideDeleteForm() {
+        document.getElementById("deleteForm").style.display = "none";
+      }
+
+      function eliminarCombo() {
+        const comboId = document.getElementById("deleteId").value;
+
+        fetch(`/combos/${comboId}/eliminar`, {
+          method: "POST",
+        })
+          .then((response) => {
+            if (response.ok) {
+              window.location.href = "/read_combos?message=Combo eliminado exitosamente";
+            } else {
+              console.error("Error al eliminar el combo");
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      function enviarActualizarCombo(event) {
+        event.preventDefault();
+
+        const form = document.getElementById("formActualizar");
+        const formData = new FormData(form);
+
+        const comboId = document.getElementById("updateId").value;
+
+        fetch(`/combos/${comboId}/actualizar`, {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => {
+            if (response.ok) {
+              window.location.href = "/read_combos?message=Combo actualizado exitosamente";
+            } else {
+              console.error("Error al actualizar el combo. Código de estado:", response.status);
+              return response.text();
+            }
+          })
+          .then((data) => {
+            if (data) {
+              console.log("Respuesta del servidor:", data);
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    </script>
+  </body>
+</html>

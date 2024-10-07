@@ -104,3 +104,58 @@ def delete_pedido(db: Session, pedido_id: int):
         db.commit()
         return {"message": "Pedido eliminado"}
     return {"message": "Pedido no encontrado"}
+
+
+
+#======================================= COMBOS ========================================
+
+def create_combo(db: Session, combo_data: schemas.ComboCreate, ingredientes: list[str]):
+    # Crear combo
+    db_combo = models.Combo(
+        nombre=combo_data.nombre,
+        descripcion=combo_data.descripcion,
+        precio=combo_data.precio
+    )
+    
+    db.add(db_combo)
+    db.commit()
+    db.refresh(db_combo)
+
+    # Asociar los ingredientes al combo
+    for ingrediente in ingredientes:
+        db_ingrediente = models.Ingrediente(nombre=ingrediente, combo_id=db_combo.id)
+        db.add(db_ingrediente)
+
+    db.commit()
+    
+    return db_combo
+
+def get_combo(db: Session, combo_id: int):
+    return db.query(models.Combo).filter(models.Combo.id == combo_id).first()
+
+def get_combos(db: Session):
+    return db.query(models.Combo).all()
+
+def update_combo(db: Session, combo_id: int, combo_data: schemas.ComboUpdate):
+    db_combo = db.query(models.Combo).filter(models.Combo.id == combo_id).first()
+    if db_combo:
+        db_combo.nombre = combo_data.nombre
+        db_combo.descripcion = combo_data.descripcion
+        db_combo.precio = combo_data.precio
+        db.commit()
+        db.refresh(db_combo)
+        return db_combo
+    return None
+
+def delete_combo(db: Session, combo_id: int):
+    combo = db.query(models.Combo).filter(models.Combo.id == combo_id).first()
+    if combo:
+        db.delete(combo)
+        db.commit()
+        return {"status": "success", "message": "Combo eliminado correctamente"}
+    return {"status": "error", "message": "Combo no encontrado"}
+
+
+#======================================= INGREDIENTES ========================================
+def get_ingredientes_por_combo(db: Session, combo_id: int):
+    return db.query(Ingrediente).filter(Ingrediente.combo_id == combo_id).all()
