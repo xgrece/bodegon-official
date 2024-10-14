@@ -1,6 +1,7 @@
 - pasar los ingredientes al actualizar (combo)
 - 127.0.0.1:56486 - "GET /static/planilla.css HTTP/1.1" 304 Not Modified
 - revisar los metodos de mesa
+<<<<<<< HEAD
 - revisar el update de mesa
 -metodos no funcionan: act cliente, act mesas, todo sobre pedidos
 
@@ -30,3 +31,6 @@ ALTER TABLE reservas
 ADD CONSTRAINT reservas_ibfk_1 FOREIGN KEY (id_cliente) REFERENCES clientes(id);
 
 
+=======
+- revisar metodo update mesas
+>>>>>>> 191657e1fca437d6ae89d2706a37af2ecd46fe9b
