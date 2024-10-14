@@ -53,18 +53,18 @@ def create_mesa(db: Session, mesa_data: schemas.MesaCreate):
 def get_mesa(db: Session, mesa_id: int):
     return db.query(Mesa).filter(Mesa.id == mesa_id).first()
 
-def get_all_mesas(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(Mesa).offset(skip).limit(limit).all()
+def get_all_mesas(db: Session):
+    return db.query(Mesa).all()
 
-def update_mesa(db: Session, mesa_id: int, mesa_data: dict):
-    mesa = db.query(models.Mesa).filter(models.Mesa.id == mesa_id).first()
-    if not mesa:
-        return None
-    for key, value in mesa_data.items():
-        setattr(mesa, key, value)
-    db.commit()
-    db.refresh(mesa)
-    return mesa
+def update_mesa(db: Session, mesa_id: int, mesa_data: MesaUpdate):
+    db_mesa = db.query(models.Mesa).filter(models.Mesa.id == mesa_id).first()
+    if db_mesa:
+        db_mesa.capacidad = mesa_data.capacidad  # Actualiza solo la capacidad
+        db_mesa.disponible = mesa_data.disponible  # Actualiza solo la disponibilidad
+        db.commit()
+        db.refresh(db_mesa)
+        return db_mesa
+    return None
 
 def delete_mesa(db: Session, mesa_id: int):
     db_mesa = db.query(Mesa).filter(Mesa.id == mesa_id).first()
@@ -155,7 +155,95 @@ def delete_combo(db: Session, combo_id: int):
         return {"status": "success", "message": "Combo eliminado correctamente"}
     return {"status": "error", "message": "Combo no encontrado"}
 
-
 #======================================= INGREDIENTES ========================================
 def get_ingredientes_por_combo(db: Session, combo_id: int):
-    return db.query(Ingrediente).filter(Ingrediente.combo_id == combo_id).all()
+    return db.query(models.Ingrediente).filter(models.Ingrediente.combo_id == combo_id).all()
+
+#======================================= RESERVAS ========================================
+# Crear una nueva reserva
+def create_reserva(db: Session, reserva: schemas.ReservaCreate):
+    # Crear una nueva reserva con todos los campos requeridos
+    db_reserva = models.Reserva(
+        id_cliente=reserva.id_cliente,  # Asegúrate de usar cliente_id
+        mesa_id=reserva.mesa_id,        # Asegúrate de usar mesa_id
+        fecha_reserva=reserva.fecha_reserva,  # Añadir la fecha de la reserva
+        hora_reserva=reserva.hora_reserva     # Añadir la hora de la reserva
+    )
+    db.add(db_reserva)  # Añadir la reserva a la sesión
+    db.commit()         # Confirmar los cambios en la base de datos
+    db.refresh(db_reserva)  # Obtener la instancia actualizada
+    return db_reserva
+
+# Obtener todas las reservas
+def get_reservas(db: Session):
+    return db.query(models.Reserva).all()
+
+# Obtener una reserva por ID
+def get_reserva(db: Session, reserva_id: int):
+    db_reserva = db.query(models.Reserva).filter(models.Reserva.id == reserva_id).first()
+    if db_reserva is None:
+        return None
+    # Asegurarse de que id_cliente esté presente en db_reserva
+    print(db_reserva.id_cliente)  # Verificar si id_cliente tiene un valor
+    return db_reserva
+
+# Actualizar una reserva
+def update_reserva(db: Session, reserva_id: int, reserva: schemas.ReservaCreate):
+    db_reserva = get_reserva(db, reserva_id)
+    if db_reserva:
+        db_reserva.id_cliente = reserva.id_cliente  # Cambiar cliente_id por id_cliente
+        db_reserva.mesa_id = reserva.mesa_id
+        db_reserva.fecha_reserva = reserva.fecha_reserva
+        db_reserva.hora_reserva = reserva.hora_reserva
+        db.commit()
+        db.refresh(db_reserva)
+        return db_reserva
+    return None
+
+# Eliminar una reserva
+def delete_reserva(db: Session, reserva_id: int):
+    db_reserva = get_reserva(db, reserva_id)
+    if db_reserva:
+        db.delete(db_reserva)
+        db.commit()
+        return {"status": "success"}
+    return {"status": "error"}
+#======================================= CUENTAS ========================================
+# Crear una nueva cuenta
+def create_cuenta(db: Session, cuenta: schemas.CuentaCreate):
+    nueva_cuenta = models.Cuenta(
+        total=cuenta.total,
+        reserva_id=cuenta.reserva_id,
+        metodo_pago=cuenta.metodo_pago
+    )
+    db.add(nueva_cuenta)
+    db.commit()
+    db.refresh(nueva_cuenta)
+    return nueva_cuenta
+
+# Obtener todas las cuentas
+def get_cuentas(db: Session):
+    return db.query(models.Cuenta).all()
+
+# Obtener una cuenta por ID
+def get_cuenta(db: Session, cuenta_id: int):
+    return db.query(models.Cuenta).filter(models.Cuenta.id == cuenta_id).first()
+
+# Actualizar una cuenta
+def update_cuenta(db: Session, cuenta_id: int, cuenta: schemas.CuentaCreate):
+    db_cuenta = get_cuenta(db, cuenta_id)
+    if db_cuenta:
+        db_cuenta.id_reserva = cuenta.id_reserva  # Otras propiedades según tu modelo
+        db.commit()
+        db.refresh(db_cuenta)
+        return db_cuenta
+    return None
+
+# Eliminar una cuenta
+def delete_cuenta(db: Session, cuenta_id: int):
+    db_cuenta = get_cuenta(db, cuenta_id)
+    if db_cuenta:
+        db.delete(db_cuenta)
+        db.commit()
+        return {"status": "success"}
+    return {"status": "error"}

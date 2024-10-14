@@ -1,3 +1,32 @@
 - pasar los ingredientes al actualizar (combo)
 - 127.0.0.1:56486 - "GET /static/planilla.css HTTP/1.1" 304 Not Modified
 - revisar los metodos de mesa
+- revisar el update de mesa
+-metodos no funcionan: act cliente, act mesas, todo sobre pedidos
+
+
+
+-tabla cuentas
+
+ALTER TABLE mesas
+ADD COLUMN id_cliente INT;
+
+ALTER TABLE mesas
+ADD CONSTRAINT fk_cliente
+FOREIGN KEY (id_cliente) REFERENCES cliente(id) ON DELETE SET NULL;
+
+
+
+-ALTER TABLE mesas DROP FOREIGN KEY fk_cliente;
+
+-cambiar la fk de cliente_id a id_cliente
+ALTER TABLE reservas
+DROP FOREIGN KEY reservas_ibfk_1;  -- Elimina la clave foránea de cliente_id
+
+ALTER TABLE reservas
+CHANGE cliente_id id_cliente INT(11) DEFAULT NULL;
+
+ALTER TABLE reservas
+ADD CONSTRAINT reservas_ibfk_1 FOREIGN KEY (id_cliente) REFERENCES clientes(id);
+
+

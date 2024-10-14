@@ -7,15 +7,15 @@
     <link rel="stylesheet" href="/static/planilla.css" />
   </head>
   <body>
-    <header>
-      <h1>Lista de Clientes</h1>
-    </header>
-    <nav>
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/crear_cliente">Crear Cliente</a></li>
-      </ul>
-    </nav>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="crear_cliente">Crear Cliente</a></li>
+        </ul>
+        <h1>Lista de Clientes</h1>
+      </nav>
+    </div>
 
     <!-- Mensaje de éxito (si existe) -->
     {% if message %}
@@ -120,11 +120,9 @@
 
             // Mostrar el formulario de actualización
             document.getElementById("updateForm").style.display = "block";
-            document.getElementById("deleteForm").style.display = "none"; // Asegurarse de que el formulario de eliminación esté oculto
           })
           .catch((error) => console.error("Error al obtener el cliente:", error));
       }
-
       function showDeleteForm(id) {
         document.getElementById("deleteId").value = id;
         document.getElementById("deleteForm").style.display = "block";

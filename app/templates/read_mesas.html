@@ -7,15 +7,15 @@
     <link rel="stylesheet" href="/static/planilla.css" />
   </head>
   <body>
-    <header>
-      <h1>Lista de Mesas</h1>
-    </header>
-    <nav>
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/crear_mesa">Crear Mesa</a></li>
-      </ul>
-    </nav>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/crear_mesa">Crear Mesa</a></li>
+        </ul>
+        <h1>Lista de Mesas</h1>
+      </nav>
+    </div>
 
     <!-- Mensaje de éxito (si existe) -->
     {% if message %}
@@ -31,18 +31,16 @@
           <th>Número de Mesa</th>
           <th>Capacidad</th>
           <th>Disponible</th>
-          <th>nombre cliente</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
         {% for mesa in mesas %}
-        <tr>
+        <tr id="mesa-{{ mesa.id }}">
           <td>{{ mesa.id }}</td>
           <td>{{ mesa.numero_mesa }}</td>
-          <td>{{ mesa.capacidad }}</td>
-          <td>{{ "Sí" if mesa.disponible else "No" }}</td>
-          <td>{{ mesa.cliente.nombre if mesa.cliente else "N/A" }}</td>
+          <td id="mesa-{{ mesa.id }}-capacidad">{{ mesa.capacidad }}</td>
+          <td id="mesa-{{ mesa.id }}-disponible">{{ "Sí" if mesa.disponible else "No" }}</td>
           <td>
             <button onclick="showUpdateForm('{{ mesa.id }}')">Actualizar</button>
             <button onclick="showDeleteForm('{{ mesa.id }}')">Eliminar</button>
@@ -55,21 +53,12 @@
     <!-- Formulario de actualización -->
     <div id="updateForm" style="display: none">
       <h2>Actualizar Mesa</h2>
-      <form id="formActualizar" action="" method="post" onsubmit="enviarActualizarMesa(event)">
+      <form id="formActualizar" method="post" onsubmit="enviarActualizarMesa(event)">
         <input type="hidden" id="updateId" name="id" />
-        <input type="hidden" name="_method" value="PUT" />
-        <!-- Campo para indicar que es una actualización -->
-
-        <div class="acomodar-input">
-          <label for="updateNumeroMesa">Número de Mesa:</label>
-          <input type="number" id="updateNumeroMesa" name="numero_mesa" required />
-        </div>
-
         <div class="acomodar-input">
           <label for="updateCapacidad">Capacidad:</label>
           <input type="number" id="updateCapacidad" name="capacidad" required />
         </div>
-
         <div class="acomodar-input">
           <label for="updateDisponible">Disponible:</label>
           <select id="updateDisponible" name="disponible" required>
@@ -77,7 +66,6 @@
             <option value="false">No</option>
           </select>
         </div>
-
         <div class="botones-act-dele">
           <button type="submit">Actualizar</button>
           <button class="pis" type="button" onclick="hideUpdateForm()">Cancelar</button>
@@ -102,7 +90,6 @@
       function showUpdateForm(id) {
         // Limpiar el formulario antes de llenarlo
         document.getElementById("updateId").value = "";
-        document.getElementById("updateNumeroMesa").value = "";
         document.getElementById("updateCapacidad").value = "";
         document.getElementById("updateDisponible").value = "true"; // Establece el valor por defecto
 
@@ -117,7 +104,6 @@
           .then((mesa) => {
             // Llenar el formulario con los datos de la mesa
             document.getElementById("updateId").value = mesa.id;
-            document.getElementById("updateNumeroMesa").value = mesa.numero_mesa;
             document.getElementById("updateCapacidad").value = mesa.capacidad;
             document.getElementById("updateDisponible").value = mesa.disponible ? "true" : "false";
 
@@ -125,6 +111,39 @@
             document.getElementById("updateForm").style.display = "block";
           })
           .catch((error) => console.error("Error al obtener la mesa:", error));
+      }
+
+      function enviarActualizarMesa(event) {
+        event.preventDefault(); // Evitar el envío normal del formulario
+
+        const form = document.getElementById("formActualizar");
+        const formData = new FormData(form); // Recoger todos los campos del formulario
+        const mesaId = document.getElementById("updateId").value;
+
+        // Asegúrate de que los valores de 'capacidad' y 'disponible' se envían correctamente
+        console.log("Datos a enviar:", {
+          id: mesaId,
+          capacidad: formData.get("capacidad"),
+          disponible: formData.get("disponible"),
+        });
+
+        fetch(`/mesas/${mesaId}/actualizar`, {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => {
+            if (response.ok) {
+              return response.json(); // Espera un JSON en respuesta
+            } else {
+              console.error("Error al actualizar la mesa. Código de estado:", response.status);
+              return Promise.reject(response.statusText);
+            }
+          })
+          .then((data) => {
+            console.log("Respuesta del servidor:", data);
+            // Actualiza la tabla y muestra el mensaje de éxito
+          })
+          .catch((error) => console.error("Error:", error));
       }
 
       function showDeleteForm(id) {
@@ -163,44 +182,6 @@
           .catch((error) => {
             console.error("Error:", error);
           });
-      }
-
-      function enviarActualizarMesa(event) {
-        event.preventDefault(); // Evitar el envío normal del formulario
-
-        const form = document.getElementById("formActualizarMesa");
-        const formData = new FormData(form); // Recoger todos los campos del formulario
-        const mesaId = document.getElementById("updateId").value;
-
-        fetch(`/mesas/${mesaId}/actualizar`, {
-          method: "POST",
-          body: formData,
-        })
-          .then((response) => {
-            if (response.ok) {
-              return response.json(); // Espera un JSON en respuesta
-            } else {
-              console.error("Error al actualizar la mesa. Código de estado:", response.status);
-              return Promise.reject(response.statusText);
-            }
-          })
-          .then((data) => {
-            // Actualiza la UI para reflejar la nueva información de la mesa
-            console.log("Respuesta del servidor:", data);
-
-            // Aquí puedes actualizar la tabla o cualquier otro elemento en la UI
-            // Ejemplo:
-            document.getElementById(`mesa-${mesaId}-numero`).innerText = formData.get("numero_mesa");
-            document.getElementById(`mesa-${mesaId}-capacidad`).innerText = formData.get("capacidad");
-            document.getElementById(`mesa-${mesaId}-disponible`).innerText = formData.get("disponible");
-
-            // Ocultar el formulario de actualización
-            document.getElementById("updateForm").style.display = "none";
-
-            // Opcional: Mostrar un mensaje de éxito
-            alert(data.mensaje);
-          })
-          .catch((error) => console.error("Error:", error));
       }
     </script>
   </body>

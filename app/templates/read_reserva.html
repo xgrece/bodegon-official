@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista de Reservas</title>
+    <link rel="stylesheet" href="/static/planilla.css" />
+  </head>
+  <body>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/crear_reserva">Crear Reserva</a></li>
+        </ul>
+        <h1>Lista de Reservas</h1>
+      </nav>
+    </div>
+
+    <!-- Mensaje de éxito (si existe) -->
+    {% if message %}
+    <div class="message-container">
+      <p class="message">{{ message }}</p>
+    </div>
+    {% endif %}
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Cliente</th>
+          <th>Mesa</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for reserva in reservas %}
+        <tr>
+          <td>{{ reserva.id }}</td>
+          <td>{{ reserva.fecha_reserva}}</td>
+          <td>{{ reserva.hora_reserva }}</td>
+          <td>{{ reserva.cliente.nombre }} {{ reserva.cliente.apellido }}</td>
+          <td>{{ reserva.mesa.numero_mesa }}</td>
+          <td>
+            <button onclick="showUpdateForm('{{ reserva.id }}')">Actualizar</button>
+            <button onclick="showDeleteForm('{{ reserva.id }}')">Eliminar</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Formulario de actualización -->
+    <div id="updateForm" style="display: none">
+      <h2>Actualizar Reserva</h2>
+      <form
+        id="formActualizar"
+        action="/reservas/<reserva_id>/actualizar"
+        method="post"
+        onsubmit="enviarActualizarReserva(event)"
+      >
+        <input type="hidden" id="updateId" name="id" />
+        <div class="acomodar-input">
+          <label for="updateFecha">Fecha:</label>
+          <input type="date" id="updateFecha" name="fecha" required />
+        </div>
+        <div class="acomodar-input">
+          <label for="updateHora">Hora:</label>
+          <input type="time" id="updateHora" name="hora" required />
+        </div>
+        <div class="acomodar-input">
+          <label for="updateCliente">Cliente:</label>
+          <select id="updateCliente" name="id_cliente" required>
+            <!-- Cambiado a id_cliente -->
+            {% for cliente in clientes %}
+            <option value="{{ cliente.id }}">{{ cliente.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="acomodar-input">
+          <label for="updateMesa">Mesa:</label>
+          <select id="updateMesa" name="mesa_id" required>
+            {% for mesa in mesas %}
+            <option value="{{ mesa.id }}">Mesa {{ mesa.numero }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="botones-act-dele">
+          <button type="submit">Actualizar</button>
+          <button class="pis" type="button" onclick="hideUpdateForm()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Formulario de eliminación -->
+    <div id="deleteForm" style="display: none">
+      <h2>Eliminar Reserva</h2>
+      <form id="deleteReservaForm" method="post">
+        <input type="hidden" id="deleteId" name="id" />
+        <p class="parrafo">¿Estás seguro de que deseas eliminar esta reserva?</p>
+        <div class="botones-act-dele1">
+          <button type="button" onclick="eliminarReserva()">Eliminar</button>
+          <button class="pis" type="button" onclick="hideDeleteForm()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      function showUpdateForm(id) {
+        // Limpiar el formulario antes de llenarlo
+        document.getElementById("updateId").value = "";
+        document.getElementById("updateFecha").value = "";
+        document.getElementById("updateHora").value = "";
+
+        // Obtener la reserva usando el ID
+        fetch(`/reservas/${id}`)
+          .then((response) => response.json())
+          .then((reserva) => {
+            // Llenar el formulario con los datos de la reserva
+            document.getElementById("updateId").value = reserva.id;
+            document.getElementById("updateFecha").value = reserva.fecha;
+            document.getElementById("updateHora").value = reserva.hora;
+            document.getElementById("updateCliente").value = reserva.cliente_id;
+            document.getElementById("updateMesa").value = reserva.mesa_id;
+
+            // Mostrar el formulario de actualización
+            document.getElementById("updateForm").style.display = "block";
+            document.getElementById("deleteForm").style.display = "none"; // Ocultar el formulario de eliminación
+          })
+          .catch((error) => console.error("Error al obtener la reserva:", error));
+      }
+
+      function showDeleteForm(id) {
+        document.getElementById("deleteId").value = id;
+        document.getElementById("deleteForm").style.display = "block";
+        document.getElementById("updateForm").style.display = "none"; // Ocultar el formulario de actualización
+      }
+
+      function hideUpdateForm() {
+        document.getElementById("updateForm").style.display = "none";
+      }
+
+      function hideDeleteForm() {
+        document.getElementById("deleteForm").style.display = "none";
+      }
+
+      function eliminarReserva() {
+        const reservaId = document.getElementById("deleteId").value;
+
+        fetch(`/reservas/${reservaId}/eliminar`, {
+          method: "POST",
+        })
+          .then((response) => {
+            if (response.ok) {
+              window.location.href = "/read_reserva?message=Reserva eliminada exitosamente";
+            } else {
+              console.error("Error al eliminar la reserva");
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      function enviarActualizarReserva(event) {
+        event.preventDefault(); // Evitar el envío normal del formulario
+
+        const form = document.getElementById("formActualizar");
+        const formData = new FormData(form);
+
+        const reservaId = document.getElementById("updateId").value;
+
+        fetch(`/reservas/${reservaId}/actualizar`, {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => {
+            if (response.ok) {
+              window.location.href = "/read_reservas?message=Reserva actualizada exitosamente";
+            } else {
+              console.error("Error al actualizar la reserva. Código de estado:", response.status);
+              return response.text();
+            }
+          })
+          .then((data) => {
+            if (data) {
+              console.log("Respuesta del servidor:", data);
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    </script>
+  </body>
+</html>

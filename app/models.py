@@ -18,7 +18,7 @@ class Cliente(Base):
     # Relaciones
     reservas = relationship("Reserva", back_populates="cliente")
     pedidos = relationship("Pedido", back_populates="cliente")
-    mesas = relationship("Mesa", back_populates="cliente")  # Relación uno a muchos con Mesa
+
 
     # Métodos CRUD
     @classmethod
@@ -56,13 +56,10 @@ class Mesa(Base):
     numero_mesa = Column(Integer, unique=True, index=True)
     capacidad = Column(Integer)
     disponible = Column(Boolean, default=True)
-    id_cliente = Column(Integer, ForeignKey("clientes.id"), nullable=False)
 
-    # Otras relaciones
-    cliente = relationship("Cliente", back_populates="mesas")
+    #Relaciones
     reservas = relationship("Reserva", back_populates="mesa")
     pedidos = relationship("Pedido", back_populates="mesa")
-    
     
     
     
@@ -98,13 +95,15 @@ class Mesa(Base):
 class Reserva(Base):
     __tablename__ = 'reservas'
     id = Column(Integer, primary_key=True, index=True)
-    cliente_id = Column(Integer, ForeignKey('clientes.id'))
+    id_cliente = Column(Integer, ForeignKey('clientes.id'))
     mesa_id = Column(Integer, ForeignKey('mesas.id'))
     fecha_reserva = Column(DateTime, default=datetime.utcnow)
     hora_reserva = Column(String(10))
-    estado = Column(String(50), default="pendiente")
+    
+    #Relaciones
     cliente = relationship("Cliente", back_populates="reservas")
     mesa = relationship("Mesa", back_populates="reservas")
+    cuenta = relationship("Cuenta", back_populates="reservas")
     
     # Métodos CRUD
     @classmethod
@@ -141,8 +140,10 @@ class Combo(Base):
     nombre = Column(String(250), index=True)
     descripcion = Column(String(500))
     precio = Column(Float)
+    #Relaciones
     pedidos = relationship("Pedido", back_populates="combo")
     ingredientes = relationship("Ingrediente", back_populates="combo")
+    
     # Métodos CRUD
     @classmethod
     def create(cls, session: Session, **kwargs):
@@ -180,6 +181,8 @@ class Pedido(Base):
     combo_id = Column(Integer, ForeignKey('combos.id'))
     fecha_pedido = Column(DateTime, default=datetime.utcnow)
     total_pedido = Column(Float)
+    
+    #Relaciones
     cliente = relationship("Cliente", back_populates="pedidos")
     mesa = relationship("Mesa", back_populates="pedidos")
     combo = relationship("Combo", back_populates="pedidos")
@@ -218,6 +221,8 @@ class MetodoPago(Base):
     __tablename__ = 'metodos_pago'
     id = Column(Integer, primary_key=True, index=True)
     tipo_metodo = Column(String(50), index=True)
+    
+    #Relaciones
     pagos = relationship("Pago", back_populates="metodo_pago")
     
     # Métodos CRUD
@@ -256,6 +261,8 @@ class Pago(Base):
     metodo_pago_id = Column(Integer, ForeignKey('metodos_pago.id'))
     monto = Column(Float)
     fecha_pago = Column(DateTime, default=datetime.utcnow)
+    
+    #Relaciones
     pedido = relationship("Pedido", back_populates="pagos")
     metodo_pago = relationship("MetodoPago", back_populates="pagos")
     
@@ -333,6 +340,8 @@ class Proveedor(Base):
     telefono = Column(String(15))
     email = Column(String(250), unique=True, index=True)
     direccion = Column(String(500))
+    
+    #Relaciones
     inventario = relationship("Inventario", back_populates="proveedor")
     
     # Métodos CRUD
@@ -370,6 +379,8 @@ class Inventario(Base):
     producto = Column(String(250))
     cantidad = Column(Integer)
     proveedor_id = Column(Integer, ForeignKey('proveedores.id'))
+    
+    #Relaciones
     proveedor = relationship("Proveedor", back_populates="inventario")
     
     # Métodos CRUD
@@ -410,4 +421,17 @@ class Ingrediente(Base):
     nombre = Column(String(250), index=True)
     combo_id = Column(Integer, ForeignKey("combos.id"))
 
+#Relaciones
     combo = relationship("Combo", back_populates="ingredientes")
+    
+#============================== CUENTAS ========================================
+class Cuenta(Base):
+    __tablename__ = 'cuentas'
+    id = Column(Integer, primary_key=True, index=True)
+    total = Column(Float, nullable=False)
+    metodo_pago = Column(String(50), nullable=True)
+    reserva_id = Column(Integer, ForeignKey('reservas.id'), nullable=False)
+
+    #Relaciones
+    reservas = relationship("Reserva", back_populates="cuenta")
+    

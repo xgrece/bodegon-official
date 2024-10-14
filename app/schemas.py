@@ -34,24 +34,25 @@ class MesaBase(BaseModel):
     
 
 class MesaCreate(MesaBase):
-    id_cliente: int
+    pass
 
 class MesaUpdate(MesaBase):
-    pass
+     capacidad: int  
+     disponible: bool
 
 class Mesa(MesaBase):
     id: int
-    id_cliente: int
-    reservas: List["Reserva"] = []
+    
+    reservas: List["Reserva"] = []  # Lista de reservas, no de enteros
     pedidos: List["Pedido"] = []
     class Config:
         from_attributes = True
 
 #===================================== R E S E R V A S ========================================
 class ReservaBase(BaseModel):
-    fecha: date
-    hora: time
-    cliente_id: int
+    fecha_reserva: date
+    hora_reserva: time
+    id_cliente: int
     mesa_id: int
 
 class ReservaCreate(ReservaBase):
@@ -62,8 +63,26 @@ class ReservaUpdate(ReservaBase):
 
 class Reserva(ReservaBase):
     id: int
-    cliente: Cliente
-    mesa: 'Mesa'
+    id_cliente: int
+    mesa_id: int
+    class Config:
+        from_attributes = True
+
+#===================================== CUENTAS =============================================
+class CuentaBase(BaseModel):
+    total: float
+    reserva_id: int
+    metodo_pago: Optional[str] = None
+
+class CuentaCreate(CuentaBase):
+    pass
+
+class CuentaUpdate(CuentaBase):
+    pass
+
+class Cuenta(CuentaBase):
+    id: int 
+
     class Config:
         from_attributes = True
 

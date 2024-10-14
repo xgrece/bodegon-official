@@ -14,12 +14,17 @@ body {
   background-color: #f8f8f8;
   color: #333;
   line-height: 1.6;
+  background-image: url(assets/fondo3.jpg);
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  color: white;
 }
 
 /* Encabezado */
 header {
-  background-color: #4caf50;
-  color: #ffffff;
+  background-color: rgb(16 16 16 / 50%); /* Rojo con 50% de opacidad */
+  color: #ffffff; /* Color blanco para el texto */
   padding: 20px 0;
   text-align: center;
 }
@@ -42,7 +47,7 @@ header h1 {
 
 /* Cartas (cards) */
 .card {
-  background-color: #ffffff;
+  background-color: rgb(16 16 16 / 50%);
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 20px;
@@ -60,12 +65,12 @@ header h1 {
 .card h2 {
   font-size: 1.8rem;
   margin-bottom: 15px;
-  color: #333;
+  color: #ffffff;
 }
 
 .card p {
   font-size: 1rem;
-  color: #777;
+  color: #ffffff;
   margin-bottom: 20px;
 }
 
@@ -77,7 +82,7 @@ header h1 {
 }
 
 .button {
-  background-color: #4caf50;
+  background-color: #474747;
   color: white;
   padding: 12px;
   border-radius: 8px;
@@ -88,29 +93,20 @@ header h1 {
 }
 
 .button:hover {
-  background-color: #45a049;
+  background-color: #191a19;
 }
 
 .button:active {
-  background-color: #3e8e41;
+  background-color: #85060d;
 }
 
-/* Pie de página */
 footer {
-  background-color: #333;
+  /* Ajusta el color de fondo según tu diseño */
   color: white;
-  padding: 20px 0;
   text-align: center;
   font-size: 0.9rem;
-  margin-top: 40px;
-}
-
-#descripcion {
-  background: #2a2a2a; /* Color de fondo */
-  color: white; /* Color del texto */
-  border: 1px solid #444; /* Opcional: color del borde */
-  padding: 10px; /* Opcional: espacio interno */
-  width: 100%; /* Opcional: ancho completo */
-  height: 100px; /* Opcional: altura */
-  resize: none; /* Opcional: desactivar el redimensionamiento */
+  width: 100%; /* Para asegurarte de que el footer ocupe todo el ancho de la pantalla */
+  position: fixed;
+  bottom: 0; /* Pega el footer a la parte inferior */
+  left: 0;
 }

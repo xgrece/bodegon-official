@@ -7,50 +7,16 @@ body {
   margin: 0;
   padding: 0;
   cursor: url(/static/assets/cursorWhite.png) 16 16, auto !important;
-}
-
-header {
-  background-color: #1c1c1c;
-  color: #e0f7fa;
-  padding: 20px 0;
-  text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-image: url(assets/fondo3.jpg);
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
 }
 
 h1 {
   margin: 0;
   font-size: 2.5em;
   font-weight: 600;
-}
-
-nav {
-  background-color: #333;
-  padding: 10px 20px;
-  margin-bottom: 40px;
-}
-
-nav ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-}
-
-nav ul li a {
-  padding: 10px 15px;
-  border-radius: 5px;
-  background-color: #00bcd4;
-  color: #121212;
-  text-decoration: none;
-  font-weight: 600;
-  transition: background-color 0.3s, box-shadow 0.3s;
-}
-
-nav ul li a:hover {
-  background-color: #0097a7;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 table {
@@ -63,7 +29,7 @@ th,
 td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid #00bcd4;
+  border-bottom: 1px solid #85060d;
 }
 
 th {
@@ -85,15 +51,15 @@ button {
   padding: 10px 15px;
   border: none;
   border-radius: 5px;
-  background-color: #00bcd4;
-  color: #121212;
+  background-color: #474747;
+  color: white;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.2s;
 }
 
 button:hover {
-  background-color: #0097a7;
+  background-color: #85060d;
   transform: scale(1.05);
 }
 
@@ -128,7 +94,7 @@ p {
   padding: 10px;
   border: 1px solid #00bcd4;
   border-radius: 5px;
-  background-color: #333;
+  background-color: #85060d;
   color: #e0f7fa;
 }
 
@@ -149,7 +115,7 @@ h2 {
 }
 
 .message {
-  background-color: #0097a7;
+  background-color: #85060d;
   padding: 5px 10px;
   border-radius: 25px;
   font-size: 0.9rem;
@@ -166,12 +132,12 @@ p {
 
 /* Estilos para el contenedor del formulario de actualización */
 #updateForm {
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background-color: #222;
-  border: 1px solid #00bcd4;
+  border: 1px solid #85060d;
   border-radius: 10px;
   padding: 20px;
   width: 350px;
@@ -186,7 +152,7 @@ p {
   align-items: center;
   justify-content: center;
   background-color: #222;
-  border: 1px solid #00bcd4;
+  border: 1px solid #85060d;
   border-radius: 10px;
   padding: 20px;
   width: 300px;
@@ -206,7 +172,7 @@ p {
 #deleteForm .form-group input {
   width: 100%;
   padding: 10px;
-  border: 1px solid #00bcd4;
+  border: 1px solid #85060d;
   border-radius: 5px;
   background-color: #333;
   color: #fff;
@@ -221,7 +187,7 @@ p {
 
 .acomodar-input input {
   padding: 8px;
-  border: 1px solid #00bcd4;
+  border: 1px solid #85060d;
   border-radius: 8px;
   background-color: #2a2a2a;
   color: #e0e0e0;
@@ -253,4 +219,45 @@ p {
   width: 100%; /* Opcional: ancho completo */
   height: 100px; /* Opcional: altura */
   resize: none; /* Opcional: desactivar el redimensionamiento */
+}
+
+nav {
+  background-color: #333;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgb(16 16 16 / 70%);
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+nav ul li {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+nav ul li a {
+  padding: 8px 15px;
+  background-color: #191a19;
+  color: #ffffff;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+nav ul li a:hover {
+  background-color: #85060d;
+}
+
+nav h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: white;
+  flex-grow: 1;
+  text-align: center;
 }

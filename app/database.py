@@ -7,7 +7,7 @@ MYSQL_USER = "root"
 MYSQL_PASSWORD = "123"
 MYSQL_HOST = "127.0.0.1"  # o la IP de tu servidor MySQL
 MYSQL_PORT = "3306" 
-MYSQL_DATABASE = "bodegon3"
+MYSQL_DATABASE = "bodegon4"
 
 SQLALCHEMY_DATABASE_URL = f"mysql+mysqlconnector://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
 
@@ -19,7 +19,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 # Crear todas las tablas
-#Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 
 # Test de conexión

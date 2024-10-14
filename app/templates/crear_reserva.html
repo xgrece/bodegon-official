@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crear Reserva</title>
+    <link rel="stylesheet" href="/static/crear_cliente.css" />
+  </head>
+  <body>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/read_reserva">Ver Reservas</a></li>
+        </ul>
+        <h1>Crear nueva reserva</h1>
+      </nav>
+    </div>
+
+    <div class="form-container">
+      <!-- Mostrar mensaje de éxito o error si existe -->
+      {% if message %}
+      <div class="message-container">
+        <p class="message">{{ message }}</p>
+      </div>
+      {% endif %}
+
+      <!-- Formulario para crear reserva -->
+      <form action="/crear_reserva" method="post">
+        <div class="form-group">
+          <label for="fecha_reserva">Fecha:</label>
+          <input type="date" id="fecha_reserva" name="fecha_reserva" required />
+        </div>
+
+        <div class="form-group">
+          <label for="hora_reserva">Hora:</label>
+          <input type="time" id="hora_reserva" name="hora_reserva" required />
+        </div>
+
+        <div class="form-group">
+          <label for="id_cliente">Cliente:</label>
+          <select id="id_cliente" name="id_cliente" required>
+            <option value="">Seleccione un cliente</option>
+            {% for cliente in clientes %}
+            <option value="{{ cliente.id }}">{{ cliente.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="id_mesa">Mesa:</label>
+          <select id="id_mesa" name="mesa_id" required>
+            <option value="">Seleccione una mesa</option>
+            {% for mesa in mesas %}
+            <option value="{{ mesa.id }}">Mesa {{ mesa.numero_mesa }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <button type="submit">Crear Reserva</button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

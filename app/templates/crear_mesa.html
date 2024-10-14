@@ -6,15 +6,15 @@
     <link rel="stylesheet" href="/static/crear_cliente.css" />
   </head>
   <body>
-    <header>
-      <h1>Crear nueva mesa</h1>
-    </header>
-    <nav>
-      <ul>
-        <li><a href="/">Inicio</a></li>
-        <!-- Otras opciones de navegación -->
-      </ul>
-    </nav>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/read_mesas">Ver mesas</a></li>
+        </ul>
+        <h1>Crear nueva mesa</h1>
+      </nav>
+    </div>
 
     <div class="form-container">
       <form action="/crear_mesa" method="post">
@@ -30,20 +30,21 @@
           <label for="disponible">Disponible:</label>
           <select id="disponible" name="disponible" required>
             <option value="">Seleccione...</option>
-            <option value="true">Sí</option>
-            <option value="false">No</option>
+            <option value="1">Sí</option>
+            <option value="0">No</option>
           </select>
         </div>
+        <!--
         <div class="form-group">
           <label for="id_cliente">Cliente:</label>
           <select name="id_cliente" required>
             <option value="">Seleccione un cliente</option>
             {% for cliente in clientes %}
             <option value="{{ cliente.id }}">{{ cliente.nombre }}</option>
-            <!-- Asegúrate de que 'nombre' sea el atributo correcto -->
             {% endfor %}
           </select>
         </div>
+         -->
         <button type="submit">Crear Mesa</button>
       </form>
     </div>
