@@ -1,0 +1,98 @@
+CREATE TABLE IF NOT EXISTS clientes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(250) NOT NULL,
+    apellido VARCHAR(250) NOT NULL,
+    email VARCHAR(250) UNIQUE NOT NULL,
+    telefono VARCHAR(15) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS mesas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    numero_mesa INT UNIQUE NOT NULL,
+    capacidad INT NOT NULL,
+    disponible BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE IF NOT EXISTS reservas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_cliente INT,
+    mesa_id INT,
+    fecha_reserva DATETIME DEFAULT CURRENT_TIMESTAMP,
+    hora_reserva VARCHAR(10),
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id) ON DELETE CASCADE,
+    FOREIGN KEY (mesa_id) REFERENCES mesas(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS combos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(250) NOT NULL,
+    descripcion VARCHAR(500),
+    precio FLOAT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS pedidos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cliente_id INT,
+    mesa_id INT,
+    combo_id INT,
+    fecha_pedido DATETIME DEFAULT CURRENT_TIMESTAMP,
+    total_pedido FLOAT,
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
+    FOREIGN KEY (mesa_id) REFERENCES mesas(id) ON DELETE CASCADE,
+    FOREIGN KEY (combo_id) REFERENCES combos(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS metodos_pago (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tipo_metodo VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS pagos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    pedido_id INT,
+    metodo_pago_id INT,
+    monto FLOAT NOT NULL,
+    fecha_pago DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE,
+    FOREIGN KEY (metodo_pago_id) REFERENCES metodos_pago(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS empleados (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(250) NOT NULL,
+    puesto VARCHAR(100) NOT NULL,
+    email VARCHAR(250) UNIQUE NOT NULL,
+    telefono VARCHAR(15) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS proveedores (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(250) NOT NULL,
+    contacto VARCHAR(250),
+    telefono VARCHAR(15),
+    email VARCHAR(250) UNIQUE NOT NULL,
+    direccion VARCHAR(500)
+);
+
+CREATE TABLE IF NOT EXISTS inventario (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    producto VARCHAR(250) NOT NULL,
+    cantidad INT NOT NULL,
+    proveedor_id INT,
+    FOREIGN KEY (proveedor_id) REFERENCES proveedores(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS ingredientes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(250) NOT NULL,
+    combo_id INT,
+    FOREIGN KEY (combo_id) REFERENCES combos(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS cuentas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    total FLOAT NOT NULL,
+    metodo_pago VARCHAR(50),
+    reserva_id INT NOT NULL,
+    FOREIGN KEY (reserva_id) REFERENCES reservas(id) ON DELETE CASCADE
+);
