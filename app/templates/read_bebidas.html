@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista de Bebidas</title>
+    <link rel="stylesheet" href="/static/planilla.css" />
+  </head>
+  <body>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="crear_bebida">Crear Bebida</a></li>
+        </ul>
+        <h1>Lista de Bebidas</h1>
+      </nav>
+    </div>
+
+    <!-- Mensaje de éxito (si existe) -->
+    {% if message %}
+    <div class="message-container">
+      <p class="message">{{ message }}</p>
+    </div>
+    {% endif %}
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Precio</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for bebida in bebidas %}
+        <tr>
+          <td>{{ bebida.id }}</td>
+          <td>{{ bebida.nombre }}</td>
+          <td>{{ bebida.precio }} USD</td>
+          <td>
+            <button onclick="showUpdateForm('{{ bebida.id }}')">Actualizar</button>
+            <button onclick="showDeleteForm('{{ bebida.id }}')">Eliminar</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Formulario de actualización -->
+    <div id="updateForm" style="display: none">
+      <h2>Actualizar Bebida</h2>
+      <form id="formActualizar" action="#" method="post" onsubmit="enviarActualizarBebida(event)">
+        <input type="hidden" id="updateId" name="id" />
+
+        <div class="acomodar-input">
+          <label for="updateNombre">Nombre:</label>
+          <input type="text" id="updateNombre" name="nombre" required />
+        </div>
+        <div class="acomodar-input">
+          <label for="updatePrecio">Precio:</label>
+          <input type="number" id="updatePrecio" name="precio" required />
+        </div>
+        <div class="botones-act-dele">
+          <button type="submit">Actualizar</button>
+          <button class="pis" type="button" onclick="hideUpdateForm()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Formulario de eliminación -->
+    <div id="deleteForm" style="display: none">
+      <h2>Eliminar Bebida</h2>
+      <form id="deleteBebidaForm" method="post">
+        <input type="hidden" id="deleteBebidaId" name="id" />
+        <p class="parrafo">¿Estás seguro de que deseas eliminar esta bebida?</p>
+        <div class="botones-act-dele1">
+          <button type="button" onclick="eliminarBebida()">Eliminar</button>
+          <button class="pis" type="button" onclick="hideDeleteForm()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      function showUpdateForm(id) {
+        // Limpiar el formulario antes de llenarlo
+        document.getElementById("updateId").value = "";
+        document.getElementById("updateNombre").value = "";
+        document.getElementById("updatePrecio").value = "";
+
+        // Obtener la bebida usando el ID
+        fetch(`/bebidas/${id}`)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Error al obtener la bebida");
+            }
+            return response.json();
+          })
+          .then((bebida) => {
+            // Llenar el formulario con los datos de la bebida
+            document.getElementById("updateId").value = bebida.id;
+            document.getElementById("updateNombre").value = bebida.nombre;
+            document.getElementById("updatePrecio").value = bebida.precio;
+
+            // Mostrar el formulario de actualización
+            document.getElementById("updateForm").style.display = "block";
+          })
+          .catch((error) => console.error("Error al obtener la bebida:", error));
+      }
+      function showDeleteForm(id) {
+        document.getElementById("deleteBebidaId").value = id;
+        document.getElementById("deleteForm").style.display = "block";
+        document.getElementById("updateForm").style.display = "none"; // Asegúrate de ocultar el formulario de actualización
+      }
+
+      function hideDeleteForm() {
+        document.getElementById("deleteForm").style.display = "none";
+      }
+
+      function eliminarBebida() {
+        const bebidaId = document.getElementById("deleteBebidaId").value;
+
+        fetch(`/bebidas/${bebidaId}/eliminar`, {
+          method: "POST",
+        })
+          .then((response) => {
+            if (response.ok) {
+              // Redirige a /read_bebidas con un mensaje de éxito
+              window.location.href = "/read_bebidas?message=Bebida eliminada exitosamente";
+            } else {
+              console.error("Error al eliminar la bebida");
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      function enviarActualizarBebida(event) {
+        event.preventDefault(); // Evitar el envío normal del formulario
+
+        const form = document.getElementById("formActualizar");
+        const formData = new FormData(form); // Recoger todos los campos del formulario
+
+        const bebidaId = document.getElementById("updateId").value; // Este valor debe ser un número
+
+        console.log("bebidaId:", bebidaId); // Agrega esta línea para verificar el ID
+
+        fetch(`/bebidas/${bebidaId}/actualizar`, {
+          method: "POST",
+          body: formData, // Enviar el FormData con todos los campos
+        })
+          .then((response) => {
+            if (response.ok) {
+              window.location.href = "/read_bebidas?message=Bebida actualizada exitosamente";
+            } else {
+              console.error("Error al actualizar la bebida. Código de estado:", response.status);
+              return response.text(); // Cambiar de .json() a .text() si no es JSON
+            }
+          })
+          .then((data) => {
+            if (data) {
+              console.log("Respuesta del servidor:", data);
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    </script>
+  </body>
+</html>

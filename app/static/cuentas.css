@@ -1,0 +1,124 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+/* Estilos globales */
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #f8f8f8;
+  color: white;
+  background-image: url(assets/fondo3.jpg);
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+}
+
+/* Encabezado */
+nav {
+  background-color: #333;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgb(16 16 16 / 70%);
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+nav ul li {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+nav ul li a {
+  padding: 8px 15px;
+  background-color: #191a19;
+  color: #ffffff;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+nav ul li a:hover {
+  background-color: #85060d;
+}
+
+nav h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: white;
+  flex-grow: 1;
+  text-align: center;
+  margin-right: 200px;
+}
+
+/* Contenedor de las cuentas */
+.cuentas-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* Cartas de las cuentas */
+.cuenta {
+  background-color: rgba(16, 16, 16, 0.6);
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 280px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cuenta:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.cuenta h2,
+.cuenta p {
+  color: white;
+}
+
+.cuenta h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.cuenta p {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+/* Botones */
+button {
+  background-color: #474747;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+
+button:hover {
+  background-color: #191a19;
+}
+
+button:active {
+  background-color: #85060d;
+}

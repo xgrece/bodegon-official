@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Crear Cuenta</title>
+    <link rel="stylesheet" href="/static/crear_cliente.css" />
+  </head>
+  <body>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="read_cuentas">Ver Cuentas</a></li>
+        </ul>
+        <h1>Crear nueva cuenta</h1>
+      </nav>
+    </div>
+
+    <div class="form-container">
+      <form action="/crear_cuenta" method="post">
+        <div class="form-group">
+          <label for="id_mesa">Mesa:</label>
+          <select id="id_mesa" name="mesa_id" required>
+            <option value="">Seleccione una mesa</option>
+            {% for mesa in mesas %}
+            <option value="{{ mesa.id }}">Mesa {{ mesa.numero_mesa }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <button type="submit">Abrir Cuenta</button>
+        </div>
+      </form>
+    </div>
+
+    {% if message %}
+    <div class="message-container">
+      <p class="message">{{ message }}</p>
+    </div>
+    {% endif %}
+  </body>
+</html>

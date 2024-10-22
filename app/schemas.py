@@ -6,7 +6,7 @@ from datetime import date, time
 
 
 
-#==================================== C L I E N T E S ========================================
+# ===================================== C L I E N T E S ========================================
 class ClienteBase(BaseModel):
     nombre: str
     apellido: Optional[str] = None
@@ -22,37 +22,36 @@ class ClienteUpdate(ClienteBase):
 class Cliente(ClienteBase):
     id: int
     reservas: List['Reserva'] = []
-    pedidos: List['Pedido'] = []
+    
     class Config:
         from_attributes = True
 
-#===================================== M E S A S ========================================
+# ===================================== M E S A S ========================================
 class MesaBase(BaseModel):
     numero_mesa: int
     capacidad: int
     disponible: bool
-    
 
 class MesaCreate(MesaBase):
     pass
 
 class MesaUpdate(MesaBase):
-     capacidad: int  
-     disponible: bool
+    capacidad: int
+    disponible: bool
 
 class Mesa(MesaBase):
     id: int
+    reservas: List["Reserva"] = []
+    cuentas: List["Cuenta"] = []
     
-    reservas: List["Reserva"] = []  # Lista de reservas, no de enteros
-    pedidos: List["Pedido"] = []
     class Config:
         from_attributes = True
 
-#===================================== R E S E R V A S ========================================
+# ==================================== R E S E R V A S ========================================
 class ReservaBase(BaseModel):
     fecha_reserva: date
     hora_reserva: time
-    id_cliente: int
+    cliente_id: int
     mesa_id: int
 
 class ReservaCreate(ReservaBase):
@@ -63,30 +62,29 @@ class ReservaUpdate(ReservaBase):
 
 class Reserva(ReservaBase):
     id: int
-    id_cliente: int
-    mesa_id: int
-    class Config:
-        from_attributes = True
-
-#===================================== CUENTAS =============================================
-class CuentaBase(BaseModel):
-    total: float
-    reserva_id: int
-    metodo_pago: Optional[str] = None
-
-class CuentaCreate(CuentaBase):
-    pass
-
-class CuentaUpdate(CuentaBase):
-    pass
-
-class Cuenta(CuentaBase):
-    id: int 
 
     class Config:
         from_attributes = True
 
-#====================================== C O M B O S ========================================
+# =================================== P R O D U C T O S ========================================
+class ProductoBase(BaseModel):
+    nombre: str
+    descripcion: Optional[str] = None
+    precio: float
+
+class ProductoCreate(ProductoBase):
+    pass
+
+class ProductoUpdate(ProductoBase):
+    pass
+
+class Producto(ProductoBase):
+    id: int
+    
+    class Config:
+        from_attributes = True
+
+# ================================== C O M B O S ========================================
 class ComboBase(BaseModel):
     nombre: str
     descripcion: Optional[str] = None
@@ -100,139 +98,104 @@ class ComboUpdate(ComboBase):
 
 class Combo(ComboBase):
     id: int
+    
+    class Config:
+        from_attributes = True
+
+# ==================================== DETALLES DE CUENTA ========================================
+class DetalleCuentaBase(BaseModel):
+    cuenta_id: int
+    producto_id: int
+    cantidad: int
+    precio_unitario: float
+    subtotal: float
+
+class DetalleCuentaCreate(DetalleCuentaBase):
+    pass
+
+class DetalleCuenta(DetalleCuentaBase):
+    id: int
+    
+    class Config:
+        from_attributes = True
+
+# =================================== CUENTAS =============================================
+class CuentaBase(BaseModel):
+    mesa_id: int
+    fecha_apertura: Optional[date] = None
+    estado: str = "abierta"
+    total: Optional[float] = 0.0
+
+class CuentaCreate(CuentaBase):
+    pass
+
+class Cuenta(CuentaBase):
+    id: int
+    detalles: List[DetalleCuenta] = []
+    
+    class Config:
+        from_attributes = True
+
+# ================================ INGREDIENTES ========================================
+class IngredienteBase(BaseModel):
+    nombre: str
+
+class IngredienteCreate(IngredienteBase):
+    pass
+
+class IngredienteUpdate(IngredienteBase):
+    pass
+
+class Ingrediente(IngredienteBase):
+    id: int
+    
     class Config:
         from_attributes = True
 
 #================================== P E D I D O S ========================================
+# Base schema for Pedido
 class PedidoBase(BaseModel):
-    cantidad: int
-    producto: str
-    # Puedes agregar más campos si tienes relaciones, por ejemplo, cliente_id, combo_id, etc.
+    cliente_id: int
+    mesa_id: int
+    combo_id: int
+    fecha_pedido: Optional[date] = None
+    total_pedido: float
 
+# Schema for creating a Pedido
 class PedidoCreate(PedidoBase):
     pass
 
-class PedidoUpdate(PedidoBase):
-    pass
+# Schema for updating a Pedido (optional fields for partial update)
+class PedidoUpdate(BaseModel):
+    cliente_id: Optional[int] = None
+    mesa_id: Optional[int] = None
+    combo_id: Optional[int] = None
+    fecha_pedido: Optional[date] = None
+    total_pedido: Optional[float] = None
 
+# Schema for reading Pedido (includes id)
 class Pedido(PedidoBase):
     id: int
-    # Relaciones, si es necesario
-    cliente_id: int  # si está relacionado con cliente, por ejemplo
-    combo_id: Optional[int] = None  # si aplica
-    class Config:
-        from_attributes = True
 
-#============================== METODOS PAGO ========================================
-class MetodoPagoBase(BaseModel):
-    nombre: str
-
-class MetodoPagoCreate(MetodoPagoBase):
-    pass
-
-class MetodoPagoUpdate(MetodoPagoBase):
-    pass
-
-class MetodoPago(MetodoPagoBase):
-    id: int
-    class Config:
-        from_attributes = True
-
-#=================================== P A G O S ========================================
-class PagoBase(BaseModel):
-    monto: float
-    fecha: date
-    metodo_pago_id: int
-
-class PagoCreate(PagoBase):
-    pass
-
-class PagoUpdate(PagoBase):
-    pass
-
-class Pago(PagoBase):
-    id: int
-    class Config:
-        from_attributes = True
-
-#=========================== E M P L E A D O S ========================================
-class EmpleadoBase(BaseModel):
-    nombre: str
-    email: str
-    telefono: Optional[str] = None
-    rol: str
-
-class EmpleadoCreate(EmpleadoBase):
-    pass
-
-class EmpleadoUpdate(EmpleadoBase):
-    pass
-
-class Empleado(EmpleadoBase):
-    id: int
-    class Config:
-        from_attributes = True
-
-
-#============================= P R O V E E D O R E S ========================================
-class ProveedorBase(BaseModel):
-    nombre: str
-    contacto: Optional[str] = None
-    telefono: Optional[str] = None
-    email: str
-    direccion: Optional[str] = None
-
-class ProveedorCreate(ProveedorBase):
-    pass
-
-class ProveedorUpdate(ProveedorBase):
-    pass
-
-class Proveedor(ProveedorBase):
-    id: int
-    inventario: List['Inventario'] = []
     class Config:
         from_attributes = True
         
-#=================================== I N V E N T A R I O ========================================
-class InventarioBase(BaseModel):
-    producto: str
-    cantidad: int
-    proveedor_id: int
-
-class InventarioCreate(InventarioBase):
-    pass
-
-class InventarioUpdate(InventarioBase):
-    pass
-
-class Inventario(InventarioBase):
-    id: int
-    proveedor: Proveedor
-    class Config:
-        from_attributes = True
         
-#---------------------- U S U A R I O ----------------------------------------------
+#================================== B E B I D A S ========================================
+from pydantic import BaseModel
 
-#=================================== INGREDIENTES ========================================
-
-# Base schema for Ingredient
-class IngredienteBase(BaseModel):
+class BebidaBase(BaseModel):
     nombre: str
+    precio: float
 
-# Schema for creating a new ingredient
-class IngredienteCreate(IngredienteBase):
+class BebidaCreate(BebidaBase):
     pass
 
-# Schema for updating an ingredient (in case you need it in the future)
-class IngredienteUpdate(IngredienteBase):
+class BebidaUpdate(BebidaBase):
     pass
 
-# Full schema for Ingredient (used when reading from DB)
-class Ingrediente(IngredienteBase):
+class Bebida(BebidaBase):
     id: int
-    combo_id: int
 
     class Config:
         from_attributes = True
-

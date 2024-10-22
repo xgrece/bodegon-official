@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Crear Bebida</title>
+    <link rel="stylesheet" href="/static/crear_cliente.css" />
+  </head>
+  <body>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="read_bebidas.html">Ver Bebibas</a></li>
+        </ul>
+        <h1>Crear nueva bebida</h1>
+      </nav>
+    </div>
+
+    <div class="form-container">
+      <form action="/crear_bebida" method="post">
+        <div class="form-group">
+          <label for="nombre">Nombre:</label>
+          <input type="text" id="nombre" name="nombre" required />
+        </div>
+        <div class="form-group">
+          <label for="precio">Precio:</label>
+          <input type="number" id="precio" name="precio" step="0.01" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <button type="submit">Crear Bebida</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Mensaje de éxito (si existe) -->
+    {% if message %}
+    <div class="message-container">
+      <p class="message">{{ message }}</p>
+    </div>
+    {% endif %}
+  </body>
+</html>

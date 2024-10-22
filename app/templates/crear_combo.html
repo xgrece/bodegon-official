@@ -13,70 +13,68 @@
     />
   </head>
   <body>
-    
-      <div>
-        <nav>
-          <ul>
-            <li><a href="/">Inicio</a></li>
-            <li><a href="/read_combos">Ver Combos</a></li>
-          </ul>
-          <h1>Crear nuevo combo</h1>
-        </nav>
-      </div>
-
-      <div class="form-container">
-        <form action="/crear_combo" method="post">
-          <div class="form-group">
-            <label for="nombre">Nombre del Combo:</label>
-            <input type="text" id="nombre" name="nombre" class="form-control" required />
-          </div>
-          <div class="form-group">
-            <label for="descripcion">Descripción:</label>
-            <textarea id="descripcion" name="descripcion" class="form-control" required></textarea>
-          </div>
-          <div class="form-group">
-            <label for="precio">Precio:</label>
-            <input type="number" id="precio" name="precio" step="0.01" class="form-control" required />
-          </div>
-
-          <!-- Ingredientes con checkboxes -->
-          <div class="form-group">
-            <label>Productos Incluidos:</label>
-            <div class="form-check">
-              <input type="checkbox" id="papas" name="ingredientes" value="papas" class="form-check-input" />
-              <label for="papas" class="form-check-label">Papas Fritas</label>
-            </div>
-            <div class="form-check">
-              <input
-                type="checkbox"
-                id="hamburguesa"
-                name="ingredientes"
-                value="hamburguesa"
-                class="form-check-input"
-              />
-              <label for="hamburguesa" class="form-check-label">Hamburguesa</label>
-            </div>
-            <div class="form-check">
-              <input type="checkbox" id="bebida" name="ingredientes" value="bebida" class="form-check-input" />
-              <label for="bebida" class="form-check-label">Bebida</label>
-            </div>
-            <div class="form-check">
-              <input type="checkbox" id="ensalada" name="ingredientes" value="ensalada" class="form-check-input" />
-              <label for="ensalada" class="form-check-label">Ensalada</label>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <button type="submit" class="btn btn-primary mt-3">Crear Combo</button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Mensaje de éxito (si existe) -->
-      {% if message %}
-      <div class="alert alert-success mt-3" role="alert">{{ message }}</div>
-      {% endif %}
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/read_combos">Ver Combos</a></li>
+        </ul>
+        <h1>Crear nuevo combo</h1>
+      </nav>
     </div>
+
+    <div class="form-container">
+      <form action="/crear_combo" method="post">
+        <div class="form-group">
+          <label for="nombre">Nombre del Combo:</label>
+          <input type="text" id="nombre" name="nombre" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label for="descripcion">Descripción:</label>
+          <textarea id="descripcion" name="descripcion" class="form-control" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="precio">Precio:</label>
+          <input type="number" id="precio" name="precio" step="0.01" class="form-control" required />
+        </div>
+
+        <!-- Ingredientes con checkboxes -->
+        <div class="form-group">
+          <label>Productos Incluidos:</label>
+          <div class="form-check">
+            <input type="checkbox" id="papas" name="ingredientes" value="papas" class="form-check-input" />
+            <label for="papas" class="form-check-label">Papas Fritas</label>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" id="hamburguesa" name="ingredientes" value="hamburguesa" class="form-check-input" />
+            <label for="hamburguesa" class="form-check-label">Hamburguesa</label>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" id="bebida" name="ingredientes" value="bebida" class="form-check-input" />
+            <label for="bebida" class="form-check-label">Bebida</label>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" id="ensalada" name="ingredientes" value="ensalada" class="form-check-input" />
+            <label for="ensalada" class="form-check-label">Ensalada</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary mt-3">Crear Combo</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Mensaje de éxito (si existe) -->
+    {% if success_message %}
+    <div class="message-container">
+      <p class="message success">{{ success_message }}</p>
+    </div>
+    {% elif error_message %}
+    <div class="message-container">
+      <p class="message error">{{ error_message }}</p>
+    </div>
+    {% endif %}
 
     <!-- Script de Bootstrap -->
     <script

@@ -50,9 +50,13 @@
     </div>
 
     <!-- Mensaje de éxito (si existe) -->
-    {% if message %}
+    {% if success_message %}
     <div class="message-container">
-      <p class="message">{{ message }}</p>
+      <p class="message success">{{ success_message }}</p>
+    </div>
+    {% elif error_message %}
+    <div class="message-container">
+      <p class="message error">{{ error_message }}</p>
     </div>
     {% endif %}
   </body>

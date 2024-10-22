@@ -38,8 +38,8 @@
         </div>
 
         <div class="form-group">
-          <label for="id_cliente">Cliente:</label>
-          <select id="id_cliente" name="id_cliente" required>
+          <label for="cliente_id">Cliente:</label>
+          <select id="cliente_id" name="cliente_id" required>
             <option value="">Seleccione un cliente</option>
             {% for cliente in clientes %}
             <option value="{{ cliente.id }}">{{ cliente.nombre }}</option>

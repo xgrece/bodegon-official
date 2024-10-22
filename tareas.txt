@@ -29,8 +29,4 @@ CHANGE cliente_id id_cliente INT(11) DEFAULT NULL;
 
 ALTER TABLE reservas
 ADD CONSTRAINT reservas_ibfk_1 FOREIGN KEY (id_cliente) REFERENCES clientes(id);
-
-
-=======
-- revisar metodo update mesas
->>>>>>> 191657e1fca437d6ae89d2706a37af2ecd46fe9b
+git pull origin master

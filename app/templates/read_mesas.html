@@ -120,7 +120,6 @@
         const formData = new FormData(form); // Recoger todos los campos del formulario
         const mesaId = document.getElementById("updateId").value;
 
-        // Asegúrate de que los valores de 'capacidad' y 'disponible' se envían correctamente
         console.log("Datos a enviar:", {
           id: mesaId,
           capacidad: formData.get("capacidad"),
@@ -132,18 +131,24 @@
           body: formData,
         })
           .then((response) => {
-            if (response.ok) {
-              return response.json(); // Espera un JSON en respuesta
-            } else {
-              console.error("Error al actualizar la mesa. Código de estado:", response.status);
-              return Promise.reject(response.statusText);
+            if (!response.ok) {
+              throw new Error("Error al actualizar la mesa. Código de estado: " + response.status);
             }
+            return response.json(); // Espera un JSON en respuesta
           })
           .then((data) => {
             console.log("Respuesta del servidor:", data);
-            // Actualiza la tabla y muestra el mensaje de éxito
+            // Actualiza la tabla con los nuevos valores
+            document.getElementById(`mesa-${data.id}-capacidad`).textContent = data.capacidad;
+            document.getElementById(`mesa-${data.id}-disponible`).textContent = data.disponible ? "Sí" : "No";
+            // Muestra un mensaje de éxito
+            alert("Mesa actualizada exitosamente");
+            hideUpdateForm(); // Oculta el formulario después de la actualización
           })
-          .catch((error) => console.error("Error:", error));
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Error al actualizar la mesa: " + error.message); // Muestra un mensaje de error
+          });
       }
 
       function showDeleteForm(id) {
