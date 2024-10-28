@@ -141,6 +141,7 @@ class Cuenta(Base):
     # Relaciones
     reservas = relationship("Reserva", back_populates="cuenta")
     mesa = relationship("Mesa", back_populates="cuentas")
+    detalles = relationship("DetalleCuenta", back_populates="cuenta")
 
 # =============================== D E T A L L E S  D E  C U E N T A ============================
 class DetalleCuenta(Base):
@@ -153,6 +154,6 @@ class DetalleCuenta(Base):
     subtotal = Column(Float, nullable=False)
 
     # Relaciones
-    cuenta = relationship("Cuenta")
+    cuenta = relationship("Cuenta", back_populates="detalles")
     producto = relationship("Producto")
     

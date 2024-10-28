@@ -122,3 +122,26 @@ button:hover {
 button:active {
   background-color: #85060d;
 }
+
+.message-container {
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 12px;
+  text-align: center;
+  position: absolute; /* Cambiado a absolute */
+  bottom: 20px; /* Ajustado para dejar espacio en la parte inferior */
+  left: 50%;
+  transform: translateX(-50%); /* Centra horizontalmente */
+  width: 90%; /* O el tamaño que desees */
+  max-width: 600px; /* Para que no sea demasiado ancho */
+  z-index: 10; /* Asegúrate de que esté por encima de otros elementos */
+  color: white;
+}
+
+.message {
+  background-color: #85060d;
+  padding: 5px 10px;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  color: white;
+  text-align: center;
+}

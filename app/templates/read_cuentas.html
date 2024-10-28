@@ -16,6 +16,16 @@
       </nav>
     </div>
 
+    {% if message %}
+    <div class="message-container">
+      <p class="message">{{ message }}</p>
+    </div>
+    {% endif %} {% if error_message %}
+    <div class="message-container">
+      <p class="message">{{ error_message }}</p>
+    </div>
+    {% endif %}
+
     <div class="cuentas-container">
       {% for cuenta in cuentas %}
       <div class="cuenta">
@@ -29,7 +39,7 @@
 
         <!-- Formulario de agregar productos (se muestra al hacer clic en el botón) -->
         <div id="formAgregarProducto_{{ cuenta.id }}" style="display: none">
-          <form action="/agregar_producto/{{ cuenta.id }}" method="post">
+          <form id="agregarProductoForm_{{ cuenta.id }}">
             <label>Combos Disponibles:</label>
             <div>
               {% for combo in combos %}
@@ -41,9 +51,9 @@
                   value="{{ combo.id }}"
                   class="form-check-input"
                 />
-                <label for="combo_{{ combo.id }}" class="form-check-label">
-                  {{ combo.nombre }} - ${{ combo.precio }}
-                </label>
+                <label for="combo_{{ combo.id }}" class="form-check-label"
+                  >{{ combo.nombre }} - ${{ combo.precio }}</label
+                >
               </div>
               {% endfor %}
             </div>
@@ -59,17 +69,17 @@
                   value="{{ bebida.id }}"
                   class="form-check-input"
                 />
-                <label for="bebida_{{ bebida.id }}" class="form-check-label">
-                  {{ bebida.nombre }} - ${{ bebida.precio }}
-                </label>
+                <label for="bebida_{{ bebida.id }}" class="form-check-label"
+                  >{{ bebida.nombre }} - ${{ bebida.precio }}</label
+                >
               </div>
               {% endfor %}
             </div>
 
-            <label for="cantidad">Cantidad (aplica para todos los productos seleccionados):</label>
-            <input type="number" name="cantidad" id="cantidad" min="1" required />
+            <label for="cantidad_{{ cuenta.id }}">Cantidad:</label>
+            <input type="number" name="cantidad" id="cantidad_{{ cuenta.id }}" min="1" required />
 
-            <button type="submit">Agregar Productos</button>
+            <button type="button" onclick="agregarProducto('{{ cuenta.id }}')">Agregar Productos</button>
           </form>
         </div>
 
@@ -84,6 +94,35 @@
       function mostrarFormulario(cuentaId) {
         const formulario = document.getElementById(`formAgregarProducto_${cuentaId}`);
         formulario.style.display = formulario.style.display === "none" ? "block" : "none";
+      }
+
+      // Función para agregar productos a la cuenta de manera asincrónica
+      function agregarProducto(cuentaId) {
+        const form = document.getElementById(`agregarProductoForm_${cuentaId}`);
+        const formData = new FormData(form); // Recoge los datos del formulario
+
+        // Log para verificar los datos enviados
+        console.log("Datos enviados:", Array.from(formData.entries()));
+
+        fetch(`/agregar_producto/${cuentaId}`, {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => {
+            if (response.ok) {
+              return response.text(); // Espera una respuesta HTML
+            } else {
+              throw new Error("Error al agregar productos");
+            }
+          })
+          .then((data) => {
+            console.log("Respuesta del servidor:", data);
+            // Puedes mostrar un mensaje de éxito o actualizar el contenido aquí
+            location.reload(); // O actualizar dinámicamente el contenido
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
       }
 
       // Función para cerrar cuenta
