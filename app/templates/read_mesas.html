@@ -19,9 +19,7 @@
 
     <!-- Mensaje de éxito (si existe) -->
     {% if message %}
-    <div class="message-container">
-      <p class="message">{{ message }}</p>
-    </div>
+    <div id="messageContainer" class="message-container" style="display: none"></div>
     {% endif %}
 
     <table>
@@ -120,12 +118,6 @@
         const formData = new FormData(form); // Recoger todos los campos del formulario
         const mesaId = document.getElementById("updateId").value;
 
-        console.log("Datos a enviar:", {
-          id: mesaId,
-          capacidad: formData.get("capacidad"),
-          disponible: formData.get("disponible"),
-        });
-
         fetch(`/mesas/${mesaId}/actualizar`, {
           method: "POST",
           body: formData,
@@ -138,11 +130,18 @@
           })
           .then((data) => {
             console.log("Respuesta del servidor:", data);
-            // Actualiza la tabla con los nuevos valores
-            document.getElementById(`mesa-${data.id}-capacidad`).textContent = data.capacidad;
-            document.getElementById(`mesa-${data.id}-disponible`).textContent = data.disponible ? "Sí" : "No";
-            // Muestra un mensaje de éxito
-            alert("Mesa actualizada exitosamente");
+            if (data.mesa) {
+              // Si 'mesa' existe en el JSON de respuesta
+              // Actualiza la tabla con los nuevos valores
+              document.getElementById(`mesa-${data.mesa.id}-capacidad`).textContent = data.mesa.capacidad;
+              document.getElementById(`mesa-${data.mesa.id}-disponible`).textContent = data.mesa.disponible
+                ? "Sí"
+                : "No";
+              // Muestra un mensaje de éxito
+              alert("Mesa actualizada exitosamente");
+            } else {
+              console.error("Formato de respuesta inesperado:", data);
+            }
             hideUpdateForm(); // Oculta el formulario después de la actualización
           })
           .catch((error) => {

@@ -149,11 +149,10 @@ class DetalleCuenta(Base):
     id = Column(Integer, primary_key=True, index=True)
     cuenta_id = Column(Integer, ForeignKey('cuentas.id'))
     producto_id = Column(Integer, ForeignKey('productos.id'))
+    tipo_producto = Column(String(50))
     cantidad = Column(Integer, nullable=False)
     precio_unitario = Column(Float, nullable=False)
     subtotal = Column(Float, nullable=False)
 
     # Relaciones
     cuenta = relationship("Cuenta", back_populates="detalles")
-    producto = relationship("Producto")
-    

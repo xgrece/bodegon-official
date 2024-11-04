@@ -26,13 +26,13 @@ def get_db():
 
 #=============================== CLIENTES ================================================
 
-@router.get("/crear_cliente", response_class=HTMLResponse)
+@router.get("/crear_cliente", response_class=HTMLResponse, tags=["Clientes"])
 async def show_create_cliente_form(request: Request):
     return templates.TemplateResponse("crear_cliente.html", {"request": request})
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
-@router.post("/crear_cliente", response_class=HTMLResponse)
+@router.post("/crear_cliente", response_class=HTMLResponse, tags=["Clientes"])
 async def create_cliente(
     request: Request,
     nombre: str = Form(...),
@@ -55,7 +55,7 @@ async def create_cliente(
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
-@router.get("/read_clientes", response_class=HTMLResponse)
+@router.get("/read_clientes", response_class=HTMLResponse, tags=["Clientes"])
 async def read_clientes(request: Request, db: Session = Depends(get_db), message: str = None):
     clientes = crud.get_clientes(db)
     return templates.TemplateResponse("read_clientes.html", {
@@ -67,7 +67,7 @@ async def read_clientes(request: Request, db: Session = Depends(get_db), message
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 # Obtener un cliente por ID (GET)
-@router.get("/clientes/{cliente_id}", response_model=schemas.Cliente)
+@router.get("/clientes/{cliente_id}", response_model=schemas.Cliente, tags=["Clientes"])
 async def read_cliente(cliente_id: int, db: Session = Depends(get_db)):
     cliente = crud.get_cliente(db, cliente_id)
     if cliente is None:
@@ -76,7 +76,7 @@ async def read_cliente(cliente_id: int, db: Session = Depends(get_db)):
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
-@router.post("/clientes/{cliente_id}/actualizar")
+@router.post("/clientes/{cliente_id}/actualizar", tags=["Clientes"])
 async def actualizar_cliente(
     cliente_id: int, 
     nombre: str = Form(...), 
@@ -107,7 +107,7 @@ async def actualizar_cliente(
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//    
     
 # Eliminar un cliente (POST)
-@router.post("/clientes/{cliente_id}/eliminar", response_class=HTMLResponse)
+@router.post("/clientes/{cliente_id}/eliminar", response_class=HTMLResponse, tags=["Clientes"])
 async def delete_cliente(cliente_id: int, db: Session = Depends(get_db)):
     result = crud.delete_cliente(db, cliente_id)
 
@@ -162,14 +162,14 @@ def create_mesa(
         
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//        
         
-@router.get("/read_mesas")
+@router.get("/read_mesas", response_class=HTMLResponse, tags=["Mesas"])
 async def get_all_mesas(request: Request, db: Session = Depends(get_db)):
     mesas = crud.get_all_mesas(db)  # Asegúrate de que esta función devuelva la lista de mesas
     return templates.TemplateResponse("read_mesas.html", {"request": request, "mesas": mesas})
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
-@router.get("/mesas/{mesa_id}", response_model=schemas.Mesa)
+@router.get("/mesas/{mesa_id}", response_model=schemas.Mesa, tags=["Mesas"])
 async def get_mesa(mesa_id: int, db: Session = Depends(get_db)):
     mesa = crud.get_mesa(db, mesa_id)
     if mesa is None:
@@ -198,17 +198,19 @@ async def get_mesa(mesa_id: int, db: Session = Depends(get_db)):
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
-@router.post("/mesas/{mesa_id}/actualizar")
+@router.post("/mesas/{mesa_id}/actualizar", tags=["Mesas"])
 async def update_mesa(
     mesa_id: int,
-    mesa_data: schemas.MesaUpdate,  # Usa el nuevo modelo aquí
-    db: Session = Depends(get_db)
+    capacidad: int = Form(...),  # Campo para capacidad de la mesa
+    disponible: bool = Form(...),  # Campo para disponibilidad de la mesa
+    db: Session = Depends(get_db)  # Dependencia de la base de datos
 ):
     try:
+        # Llama al método de CRUD y pasa los campos directamente
         mesa_actualizada = crud.update_mesa(
             db, 
             mesa_id, 
-            mesa_data  # Aquí pasa el objeto MesaUpdate directamente
+            schemas.MesaUpdate(capacidad=capacidad, disponible=disponible)
         )
         
         if mesa_actualizada is None:
@@ -234,18 +236,50 @@ def delete_mesa(request: Request, mesa_id: int, db: Session = Depends(get_db)):
     return templates.TemplateResponse("read_mesas.html", {"request": request, "message": "Mesa eliminada"})
 
 #======================================= PEDIDOS ========================================
-pedidos = []
+@router.get("/crear_pedido", response_class=HTMLResponse, tags=["Pedidos"])
+async def create_pedido_form(request: Request):
+    return templates.TemplateResponse("crear_pedido.html", {"request": request})
 
-@router.post("/create_pedido", response_class=HTMLResponse, tags=["Pedidos"])
-async def create_pedido(request: Request, mesa: int = Form(...), producto: str = Form(...)):
-    pedidos.append({"mesa": mesa, "producto": producto})
-    return templates.TemplateResponse("pedido.html", {"request": request, "pedidos": pedidos, "message": "Pedido creado exitosamente!"})
+@router.post("/pedidos", response_model=schemas.Pedido)
+async def create_pedido(
+    mesa_id: int = Form(...),
+    combo_id: int = Form(...),
+    bebida_id: int = Form(...),
+    precio_total: float = Form(...),
+    db: Session = Depends(get_db)
+):
+    pedido_data = schemas.PedidoCreate(
+        mesa_id=mesa_id,
+        combo_id=combo_id,
+        bebida_id=bebida_id,
+        precio_total=precio_total
+    )
+    return crud.create_pedido(db, pedido_data)
 
-#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+@router.get("/pedidos", response_model=list[schemas.Pedido])
+async def read_pedidos(db: Session = Depends(get_db)):
+    return crud.get_pedidos(db)
 
-@router.get("/pedido", response_class=HTMLResponse, tags=["Pedidos"])
-async def read_pedido(request: Request):
-    return templates.TemplateResponse("pedido.html", {"request": request, "pedidos": pedidos})
+@router.get("/pedidos/{pedido_id}", response_model=schemas.Pedido)
+async def read_pedido(pedido_id: int, db: Session = Depends(get_db)):
+    db_pedido = crud.get_pedido(db, pedido_id)
+    if db_pedido is None:
+        raise HTTPException(status_code=404, detail="Pedido no encontrado")
+    return db_pedido
+
+@router.put("/pedidos/{pedido_id}", response_model=schemas.Pedido)
+async def update_pedido(pedido_id: int, pedido: schemas.PedidoUpdate, db: Session = Depends(get_db)):
+    db_pedido = crud.update_pedido(db, pedido_id, pedido)
+    if db_pedido is None:
+        raise HTTPException(status_code=404, detail="Pedido no encontrado")
+    return db_pedido
+
+@router.delete("/pedidos/{pedido_id}", response_model=schemas.Pedido)
+async def delete_pedido(pedido_id: int, db: Session = Depends(get_db)):
+    db_pedido = crud.delete_pedido(db, pedido_id)
+    if db_pedido is None:
+        raise HTTPException(status_code=404, detail="Pedido no encontrado")
+    return db_pedido
 
 #======================================= COMBOS ========================================
 # Mostrar el formulario para crear combo (GET)
@@ -435,7 +469,7 @@ async def get_reservas(request: Request, db: Session = Depends(get_db), message:
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 # Obtener una reserva por ID (GET)
-@router.get("/reservas/{reserva_id}", response_model=schemas.Reserva)
+@router.get("/reservas/{reserva_id}", response_model=schemas.Reserva, tags=["Reservas"])
 def get_reserva(reserva_id: int, db: Session = Depends(get_db)):
     db_reserva = crud.get_reserva(db=db, reserva_id=reserva_id)
     if db_reserva is None:
@@ -448,21 +482,22 @@ def get_reserva(reserva_id: int, db: Session = Depends(get_db)):
 @router.post("/reservas/{reserva_id}/actualizar", tags=["Reservas"])
 async def actualizar_reserva(
     reserva_id: int,
-     cliente_id: int = Form(...),
-    mesa_id: int = Form(...),
+    fecha_reserva: str = Form(...),  # Cambiado para recibir la fecha
+    hora_reserva: str = Form(...),    # Cambiado para recibir la hora
     db: Session = Depends(get_db)
 ):
     try:
         reserva_actualizada = crud.update_reserva(
             db,
             reserva_id,
-            schemas.ReservaCreate(
-                 cliente_id= cliente_id,  
-                mesa_id=mesa_id
+            schemas.ReservaUpdate(
+                fecha=fecha_reserva,  # Usando los nuevos datos
+                hora=hora_reserva
             )
         )
         if reserva_actualizada is None:
             raise HTTPException(status_code=404, detail="Reserva no encontrada")
+        
         return {"mensaje": "Reserva actualizada exitosamente"}
     except Exception as e:
         print(f"Error actualizando reserva: {e}")
@@ -554,7 +589,7 @@ async def read_cuentas(request: Request, db: Session = Depends(get_db), message:
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 # Obtener una cuenta por ID (GET)
-@router.get("/cuentas/{cuenta_id}", response_model=schemas.Cuenta)
+@router.get("/cuentas/{cuenta_id}", response_model=schemas.Cuenta, tags=["Cuentas"])
 def obtener_cuenta(cuenta_id: int, db: Session = Depends(get_db)):
     cuenta = crud.get_cuenta(db, cuenta_id)
     if not cuenta:
@@ -603,19 +638,22 @@ async def delete_cuenta(cuenta_id: int, db: Session = Depends(get_db)):
 async def agregar_producto(
     request: Request,
     cuenta_id: int,
-    productos: list[int] = Form(...),  # Recibe una lista de productos
-    cantidad: int = Form(...),
+    productos: list[str] = Form(...),  # Recibe una lista de strings
+    cantidad: int = Form(...),  # Cantidad debe ser un entero
     db: Session = Depends(get_db)
 ):
+    print("Productos recibidos:", productos)  # Añadir línea de depuración
+    print("Cantidad recibida:", cantidad)  # Añadir línea de depuración
+
     error_message = None
     try:
-        print(f"Procesando cuenta {cuenta_id} con productos {productos} y cantidad {cantidad}")
-        for producto_id in productos:
-            detalle = crud.agregar_producto_a_cuenta(db, cuenta_id, producto_id, cantidad)
+        for producto in productos:
+            tipo_producto, producto_id = producto.split("_")  # Extrae tipo y ID
+            print(f"Procesando: Tipo de producto - {tipo_producto}, ID - {producto_id}")  # Depuración
+            detalle = crud.agregar_producto_a_cuenta(db, cuenta_id, int(producto_id), cantidad, tipo_producto)
             if detalle is None:
-                error_message = f"Producto {producto_id} no encontrado o cuenta no válida"
-                break  # Salir del bucle si hay un error
-            print(f"Producto {producto_id} agregado correctamente a la cuenta {cuenta_id}")
+                error_message = f"Producto {producto_id} no encontrado o tipo inválido"
+                break
 
         if error_message:
             return templates.TemplateResponse("read_cuentas.html", {
@@ -629,11 +667,12 @@ async def agregar_producto(
             })
 
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(f"Se produjo un error: {str(e)}")  # Imprimir detalles del error
         return templates.TemplateResponse("read_cuentas.html", {
             "request": request,
             "error_message": f"Error al agregar productos: {str(e)}"
         })
+
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//        
         
 # Cerrar cuenta (POST)
@@ -690,7 +729,7 @@ async def read_bebidas(request: Request, db: Session = Depends(get_db), message:
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
-@router.get("/bebidas/{bebida_id}", response_model=schemas.Bebida)
+@router.get("/bebidas/{bebida_id}", response_model=schemas.Bebida ,tags=["Bebidas"])
 async def get_bebida(bebida_id: int, db: Session = Depends(get_db)):
     bebida = crud.get_bebida(db, bebida_id)
     if bebida is None:
@@ -699,7 +738,7 @@ async def get_bebida(bebida_id: int, db: Session = Depends(get_db)):
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
-@router.post("/bebidas/{bebida_id}/actualizar")
+@router.post("/bebidas/{bebida_id}/actualizar", tags=["Bebidas"])
 async def update_bebida(
     bebida_id: int,
     nombre: str = Form(...),
@@ -715,14 +754,15 @@ async def update_bebida(
                 precio=precio
             )
         )
-        
+
         if bebida_actualizada is None:
             raise HTTPException(status_code=404, detail="Bebida no encontrada")
 
+        # Asegúrate de que 'bebida_actualizada' sea el modelo
         return {
             "mensaje": "Bebida actualizada exitosamente",
             "bebida": {
-                "id": bebida_actualizada.id,
+                "id": bebida_actualizada.id,  # Este debe ser el id del objeto bebida
                 "nombre": bebida_actualizada.nombre,
                 "precio": bebida_actualizada.precio
             }
@@ -733,7 +773,7 @@ async def update_bebida(
   
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
     
-@router.post("/bebidas/{bebida_id}/eliminar")
+@router.post("/bebidas/{bebida_id}/eliminar" ,tags=["Bebidas"])
 async def delete_bebida(bebida_id: int, db: Session = Depends(get_db)):
     result = crud.delete_bebida(db, bebida_id)
     if result.get("status") == "success":

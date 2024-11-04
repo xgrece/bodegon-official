@@ -35,7 +35,7 @@ class MesaBase(BaseModel):
 class MesaCreate(MesaBase):
     pass
 
-class MesaUpdate(MesaBase):
+class MesaUpdate(BaseModel):
     capacidad: int
     disponible: bool
 

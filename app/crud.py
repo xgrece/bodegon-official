@@ -95,8 +95,8 @@ def get_mesas_disponibles(db: Session):
         
 #================================== P E D I D O S ========================================       
         
-def create_pedido(db: Session, pedido_data: PedidoCreate):
-    db_pedido = Pedido(**pedido_data.dict())
+def create_pedido(db: Session, pedido: PedidoCreate):
+    db_pedido = models.Pedido(**pedido.dict())
     db.add(db_pedido)
     db.commit()
     db.refresh(db_pedido)
@@ -104,36 +104,33 @@ def create_pedido(db: Session, pedido_data: PedidoCreate):
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
+def get_pedidos(db: Session):
+    return db.query(models.Pedido).all()
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 def get_pedido(db: Session, pedido_id: int):
-    return db.query(Pedido).filter(Pedido.id == pedido_id).first()
+    return db.query(models.Pedido).filter(models.Pedido.id == pedido_id).first()
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
-def get_all_pedidos(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(Pedido).offset(skip).limit(limit).all()
-
-#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
-
-def update_pedido(db: Session, pedido_id: int, pedido_data: PedidoUpdate):
-    db_pedido = db.query(Pedido).filter(Pedido.id == pedido_id).first()
+def update_pedido(db: Session, pedido_id: int, pedido: PedidoUpdate):
+    db_pedido = db.query(models.Pedido).filter(models.Pedido.id == pedido_id).first()
     if db_pedido:
-        for key, value in pedido_data.dict().items():
+        for key, value in pedido.dict().items():
             setattr(db_pedido, key, value)
         db.commit()
         db.refresh(db_pedido)
-        return db_pedido
-    return None
+    return db_pedido
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 def delete_pedido(db: Session, pedido_id: int):
-    db_pedido = db.query(Pedido).filter(Pedido.id == pedido_id).first()
+    db_pedido = db.query(models.Pedido).filter(models.Pedido.id == pedido_id).first()
     if db_pedido:
         db.delete(db_pedido)
         db.commit()
-        return {"message": "Pedido eliminado"}
-    return {"message": "Pedido no encontrado"}
-
+    return db_pedido
 
 
 #======================================= COMBOS ========================================
@@ -230,13 +227,12 @@ def get_reserva(db: Session, reserva_id: int):
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 # Actualizar una reserva
-def update_reserva(db: Session, reserva_id: int, reserva: schemas.ReservaCreate):
-    db_reserva = get_reserva(db, reserva_id)
+def update_reserva(db: Session, reserva_id: int, reserva_data: schemas.ReservaUpdate):
+    db_reserva = db.query(models.Reserva).filter(models.Reserva.id == reserva_id).first()
     if db_reserva:
-        db_reserva.cliente_id = reserva.cliente_id
-        db_reserva.mesa_id = reserva.mesa_id
-        db_reserva.fecha_reserva = reserva.fecha_reserva
-        db_reserva.hora_reserva = reserva.hora_reserva  # No es necesario el .time()
+        # Solo actualizar fecha y hora
+        db_reserva.fecha = reserva_data.fecha
+        db_reserva.hora = reserva_data.hora
         db.commit()
         db.refresh(db_reserva)
         return db_reserva
@@ -323,28 +319,36 @@ def abrir_cuenta(db: Session, cuenta_data: schemas.CuentaCreate):
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 # Agregar un producto a una cuenta
-def agregar_producto_a_cuenta(db: Session, cuenta_id: int, producto_id: int, cantidad: int):
-    producto = db.query(Producto).filter(Producto.id == producto_id).first()
-    if not producto:
-        return None
+def agregar_producto_a_cuenta(db: Session, cuenta_id: int, producto_id: int, cantidad: int, tipo_producto: str):
+    if tipo_producto == "bebida":
+        producto = db.query(models.Bebida).filter(models.Bebida.id == producto_id).first()
+    elif tipo_producto == "combo":
+        producto = db.query(models.Combo).filter(models.Combo.id == producto_id).first()
+    else:
+        return None  # Tipo de producto no válido
 
-    # Calcular el subtotal y el precio unitario
+    if producto is None:
+        return None  # Producto no encontrado
+
+    # Calcular subtotal
     precio_unitario = producto.precio
     subtotal = precio_unitario * cantidad
 
-    # Crear un nuevo detalle de cuenta
-    nuevo_detalle = DetalleCuenta(
+    # Crear el detalle de cuenta
+    detalle = DetalleCuenta(
         cuenta_id=cuenta_id,
         producto_id=producto_id,
         cantidad=cantidad,
         precio_unitario=precio_unitario,
-        subtotal=subtotal
+        subtotal=subtotal,
     )
-    
-    db.add(nuevo_detalle)
-    db.commit()  # Asegúrate de hacer commit aquí para guardar los cambios
-    db.refresh(nuevo_detalle)
-    return nuevo_detalle
+    print("Cuenta ID:", cuenta_id)
+    print("Productos recibidos:", producto_id)  # Añadir línea de depuración
+    print("Cantidad recibida:", cantidad)  # Añadir línea de depuración
+    db.add(detalle)
+    db.commit()
+    db.refresh(detalle)
+    return detalle
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
@@ -384,7 +388,22 @@ def get_bebida(db: Session, bebida_id: int):
     return db.query(models.Bebida).filter(models.Bebida.id == bebida_id).first()
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
-
+def update_bebida(db: Session, bebida_id: int, bebida_data: schemas.BebidaUpdate):
+    # Buscar la bebida en la base de datos
+    db_bebida = db.query(models.Bebida).filter(models.Bebida.id == bebida_id).first()
+    
+    # Verificar si la bebida existe
+    if db_bebida:
+        # Actualizar los campos de la bebida
+        db_bebida.nombre = bebida_data.nombre
+        db_bebida.precio = bebida_data.precio
+        # Confirmar los cambios en la base de datos
+        db.commit()
+        # Refrescar el objeto para obtener los datos actualizados
+        db.refresh(db_bebida)
+        return db_bebida  # Devolver el objeto actualizado
+    return None 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 def delete_bebida(db: Session, bebida_id: int):
     bebida = db.query(models.Bebida).filter(models.Bebida.id == bebida_id).first()
     if bebida:
