@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Lista de Pedidos</title>
+    <link rel="stylesheet" href="/static/planilla.css" />
+  </head>
+  <body>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/crear_pedido">Crear pedido</a></li>
+        </ul>
+        <h1>Lista de Pedidos</h1>
+      </nav>
+    </div>
+
+    <!-- Mensaje de éxito (si existe) -->
+    {% if message %}
+    <div id="messageContainer" class="message-container" style="display: none"></div>
+    {% endif %}
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Cliente</th>
+          <th>Mesa</th>
+          <th>Combo</th>
+          <th>Bebida</th>
+          <th>Total</th>
+          <th>Estado</th>
+          <th>Recibo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pedido in pedidos %}
+        <tr>
+          <td>{{ pedido.id }}</td>
+          <td>{{ pedido.cliente.nombre }}</td>
+          <td>{{ pedido.mesa.numero_mesa }}</td>
+          <td>{{ pedido.combo.nombre }} - ${{ pedido.combo.precio }}</td>
+          <td>{{ pedido.bebida.nombre }} - ${{ pedido.bebida.precio }}</td>
+          <td>${{ pedido.total_pedido }}</td>
+          <td>{{ pedido.estado }}</td>
+          <td>
+            {% if pedido.estado == 'activo' %}
+            <form action="{{ url_for('update_estado', pedido_id=pedido.id) }}" method="post">
+              <button type="submit">Finalizar</button>
+            </form>
+            {% endif %}
+          </td>
+          <td>
+            <form action="/generar_recibo/{{ pedido.id }}" method="get" target="_blank">
+              <button type="submit">Generar recibo</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

@@ -114,14 +114,13 @@ def get_pedido(db: Session, pedido_id: int):
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
-def update_pedido(db: Session, pedido_id: int, pedido: PedidoUpdate):
-    db_pedido = db.query(models.Pedido).filter(models.Pedido.id == pedido_id).first()
-    if db_pedido:
-        for key, value in pedido.dict().items():
-            setattr(db_pedido, key, value)
+def update_pedido_estado(db: Session, pedido_id: int, estado: str):
+    pedido = db.query(Pedido).filter(Pedido.id == pedido_id).first()
+    if pedido:
+        pedido.estado = estado
         db.commit()
-        db.refresh(db_pedido)
-    return db_pedido
+        db.refresh(pedido)
+    return pedido
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
@@ -411,4 +410,32 @@ def delete_bebida(db: Session, bebida_id: int):
         db.commit()
         return {"status": "success", "message": "Bebida eliminada con éxito"}
     return {"status": "error", "message": "Bebida no encontrada"}
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+def get_combo_by_id(db: Session, combo_id: int):
+    return db.query(models.Combo).filter(models.Combo.id == combo_id).first()
+
+def get_pedido_by_id(db: Session, pedido_id: int):
+    return db.query(models.Pedido).filter(models.Pedido.id == pedido_id).first()
+
+def get_bebida_by_id(db: Session, bebida_id: int):
+    return db.query(models.Bebida).filter(models.Bebida.id == bebida_id).first()
+
+
+def get_combo_precio(db: Session, combo_id: int) -> float:
+    combo = get_combo_by_id(db, combo_id)
+    if combo:
+        return combo.precio  # Asegúrate de que el objeto combo tenga un atributo 'precio'
+    return 0.0
+
+
+def get_bebida_precio(db: Session, bebida_id: int) -> float:
+    bebida = get_bebida_by_id(db, bebida_id)
+    if bebida:
+        return bebida.precio  # Asegúrate de que el objeto bebida tenga un atributo 'precio'
+    return 0.0
+
+def get_pedidos_finalizados(db: Session):
+    return db.query(models.Pedido).filter(models.Pedido.estado == 'finalizado').all()
 

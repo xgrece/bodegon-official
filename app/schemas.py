@@ -157,10 +157,11 @@ class Ingrediente(IngredienteBase):
 class PedidoBase(BaseModel):
     cliente_id: int
     mesa_id: int
-    combo_id: int
+    combo_id: Optional[int] = None
+    bebida_id: Optional[int] = None  # Añadir el campo bebida_id
     fecha_pedido: Optional[date] = None
     total_pedido: float
-
+    estado: str = "activo"
 # Schema for creating a Pedido
 class PedidoCreate(PedidoBase):
     pass
@@ -170,16 +171,26 @@ class PedidoUpdate(BaseModel):
     cliente_id: Optional[int] = None
     mesa_id: Optional[int] = None
     combo_id: Optional[int] = None
+    bebida_id: Optional[int] = None  # Añadir el campo bebida_id como opcional
     fecha_pedido: Optional[date] = None
     total_pedido: Optional[float] = None
 
-# Schema for reading Pedido (includes id)
+# Schema for reading Pedido (includes id and related fields)
 class Pedido(PedidoBase):
     id: int
+    bebida: Optional['Bebida'] = None  # Incluir la relación con Bebida
 
     class Config:
         from_attributes = True
-        
+
+# Schema for reading Bebida (to avoid circular reference)
+class Bebida(BaseModel):
+    id: int
+    nombre: str
+    precio: float
+
+    class Config:
+        from_attributes = True 
         
 #================================== B E B I D A S ========================================
 from pydantic import BaseModel

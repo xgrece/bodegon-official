@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Crear Pedido</title>
     <link rel="stylesheet" href="/static/crear_cliente.css" />
   </head>
@@ -10,48 +11,65 @@
       <nav>
         <ul>
           <li><a href="/">Inicio</a></li>
-          <li><a href="/read_pedidos">Ver pedidos</a></li>
+          <li><a href="/read_pedidos">Ver Pedidos</a></li>
         </ul>
         <h1>Crear nuevo pedido</h1>
       </nav>
     </div>
 
     <div class="form-container">
+      {% if message %}
+      <div class="message-container">
+        <p class="message">{{ message }}</p>
+      </div>
+      {% endif %}
+
       <form action="/crear_pedido" method="post">
         <div class="form-group">
-          <label for="id_mesa">Mesa:</label>
-          <select id="id_mesa" name="mesa_id" required>
+          <label for="cliente_id">Cliente:</label>
+          <select id="disponible" name="cliente_id" required>
+            <option value="">Seleccione un cliente</option>
+            {% for cliente in clientes %}
+            <option value="{{ cliente.id }}">{{ cliente.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="mesa_id">Mesa:</label>
+          <select id="disponible" name="mesa_id" required>
             <option value="">Seleccione una mesa</option>
             {% for mesa in mesas %}
             <option value="{{ mesa.id }}">Mesa {{ mesa.numero_mesa }}</option>
             {% endfor %}
           </select>
         </div>
+
         <div class="form-group">
-          <label for="combo_id">ID de Combo:</label>
-          <input type="number" id="combo_id" name="combo_id" required />
+          <label for="combo_id">Combo:</label>
+          <select id="disponible" name="combo_id" required>
+            <option value="">Seleccione un combo</option>
+            {% for combo in combos %}
+            <option value="{{ combo.id }}">{{ combo.nombre }} - ${{ combo.precio }}</option>
+            {% endfor %}
+          </select>
         </div>
+
+        <!-- Selección de Bebida -->
         <div class="form-group">
-          <label for="bebida_id">ID de Bebida:</label>
-          <input type="number" id="bebida_id" name="bebida_id" required />
+          <label for="bebida_id">Bebida:</label>
+          <select name="bebida_id" id="disponible" required>
+            <option value="">Selecciona una bebida</option>
+            {% for bebida in bebidas %}
+            <option value="{{ bebida.id }}">{{ bebida.nombre }} - ${{ bebida.precio }}</option>
+            {% endfor %}
+          </select>
         </div>
+
         <div class="form-group">
-          <label for="precio_total">Precio Total:</label>
-          <input type="number" step="0.01" id="precio_total" name="precio_total" required />
+          <button type="submit">Crear Reserva</button>
         </div>
-        <button type="submit">Crear Pedido</button>
       </form>
     </div>
-
-    <!-- Mensaje de éxito o error -->
-    {% if success_message %}
-    <div class="message-container">
-      <p class="message success">{{ success_message }}</p>
-    </div>
-    {% elif error_message %}
-    <div class="message-container">
-      <p class="message error">{{ error_message }}</p>
-    </div>
-    {% endif %}
   </body>
 </html>

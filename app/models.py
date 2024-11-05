@@ -64,7 +64,9 @@ class Bebida(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String(250), index=True)
     precio = Column(Float)
-
+    
+    # Relaciones
+    pedidos = relationship("Pedido", back_populates="bebida")
 # ================================== I N G R E D I E N T E S ========================================
 class Ingrediente(Base):
     __tablename__ = 'ingredientes'
@@ -82,14 +84,17 @@ class Pedido(Base):
     cliente_id = Column(Integer, ForeignKey('clientes.id'))
     mesa_id = Column(Integer, ForeignKey('mesas.id'))
     combo_id = Column(Integer, ForeignKey('combos.id'))
+    bebida_id = Column(Integer, ForeignKey('bebidas.id'))
     fecha_pedido = Column(DateTime, default=datetime.utcnow)
     total_pedido = Column(Float)
-
+    estado = Column(String, default="activo")
+    
     # Relaciones
     cliente = relationship("Cliente", back_populates="pedidos")
     mesa = relationship("Mesa", back_populates="pedidos")
     combo = relationship("Combo", back_populates="pedidos")
     pagos = relationship("Pago", back_populates="pedido")
+    bebida = relationship("Bebida", back_populates="pedidos")
 # ================================ M E T O D O S  D E  P A G O ================================
 class MetodoPago(Base):
     __tablename__ = 'metodos_pago'

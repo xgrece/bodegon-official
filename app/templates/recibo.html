@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Recibo del Pedido</title>
+    <link rel="stylesheet" href="/static/recibo.css" />
+  </head>
+  <body>
+    <div class="recibo-container">
+      <div class="ascii-title">T A K O Y A K I</div>
+      <h1>Recibo del Pedido</h1>
+      <p><strong>Fecha y Hora:</strong> {{ recibo.hora }}</p>
+      <p><strong>Mesa:</strong> {{ recibo.mesa_id }}</p>
+      <p><strong>Combo:</strong> {{ recibo.combo }} - ${{ recibo.precio_combo }}</p>
+      <p><strong>Bebida:</strong> {{ recibo.bebida }} - ${{ recibo.precio_bebida }}</p>
+      <p><strong>Total:</strong> ${{ recibo.total }}</p>
+    </div>
+  </body>
+</html>
